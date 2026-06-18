@@ -28506,6 +28506,24 @@ static FILE *search_load_path(s7_scheme *sc, const char *name)
   return(NULL);
 }
 
+s7_pointer s7_load_embedded(s7_scheme *sc, const char *src, const char *filename)
+{
+    // Make a port from the embedded string
+    s7_pointer port = s7_open_input_string(sc, src);
+    port_file_number(port) = remember_file_name(sc, filename);
+
+    push_input_port(sc, port);
+    sc->envir = sc->nil;
+    push_stack(sc, OP_LOAD_RETURN_IF_EOF, port, sc->code);
+
+    eval(sc, OP_READ_INTERNAL);
+
+    pop_input_port(sc);
+    if (is_input_port(port))
+        s7_close_input_port(sc, port);
+
+    return sc->value;
+}
 
 s7_pointer s7_load_with_environment(s7_scheme *sc, const char *filename, s7_pointer e)
 {

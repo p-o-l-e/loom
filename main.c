@@ -65,19 +65,35 @@ int main(int argc, char** argv)
     /* Initialize GUI context */
     field context;
     initField(&context, 0, 0, WIDTH, HEIGHT, 36, ROOT);
-    auto tb = createSector(&context, nullptr, ST_TEXTBOX, 100, 100, 100, 100, TRANSPARENT);
-
-    set_text_data(tb, "Hello");
 
     printf("[MAIN] initField\n");
 
     s7_scheme* s7 = s7_init();
     bind_gui_primitives(s7);
+    //s7_load(s7, "init.scm");
+    s7_load_embedded(s7, init_scm, "");
+    //s7_eval_c_string(s7, constraints_scm);
+    // s7_eval_c_string(s7, init_scm);
+    //
+    s7_pointer list_obj = s7_eval_c_string(s7, "descriptors");
 
-    sector_descriptor* sd = (sector_descriptor*)s7_c_pointer(s7_eval_c_string(s7, init_scm));
-    printf("Sector %u type=%d bounds=(%u,%u,%u,%u)\n",
-           sd->id, sd->type,
-           sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h);
+    if (s7_is_list(s7, list_obj)) {
+        int len = s7_list_length(s7, list_obj);
+        for(int i = 0; i < len; i++) {
+            s7_pointer item = s7_list_ref(s7, list_obj, i);
+            if(s7_is_c_pointer(item)) {
+                sector_descriptor* sd = (sector_descriptor*)s7_c_pointer(item);
+                printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u)\n",
+                    i, sd->id, sd->type,
+                    sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h);
+                    createSectorD(&context, sd);
+            } 
+            else {
+                fprintf(stderr, "Item %d is not a C pointer!\n", i);
+            }
+        }
+    }
+
 
     field_loop(&context);
 
