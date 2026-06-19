@@ -3,8 +3,8 @@
 #include "field/field.h"
 #include "s7/s7.h"
 
-const char init_scm[] = {
-#embed "init.scm"
+const char vco_scm[] = {
+#embed "modules/vco.scm"
 };
 
 typedef struct sector_descriptor sector_descriptor;
@@ -19,13 +19,15 @@ struct sector_descriptor {
     float       range[2];
     float       step[CP_LIMIT];
     uint32_t    radio_id;
+    char*       label;
     uint32_t    flags;
+    uint32_t    output;
 };
 
 sector* find_sector_by_id(field* restrict o, uint32_t id) {
     if(!id) return nullptr;
 
-    for(uint32_t i = 0; i < o->sectors; ++i) {
+    for(uint32_t i = 0; i <= o->sectors; ++i) {
         if(o->at[i].id == id) return &o->at[i];
     }
     return nullptr;
@@ -33,46 +35,56 @@ sector* find_sector_by_id(field* restrict o, uint32_t id) {
 
 sector* createSectorD(field* restrict o, sector_descriptor* d) {
     auto pos = ++o->sectors;
+    auto s = &o->at[pos];
 
-    o->at[pos].type                     = d->type;
-    o->at[pos].subtype                  = d->subtype;
-    o->at[pos].bounds.l                 = d->bounds.l;
-    o->at[pos].bounds.t                 = d->bounds.t;
-    o->at[pos].bounds.r                 = d->bounds.l + d->bounds.w;
-    o->at[pos].bounds.b                 = d->bounds.t + d->bounds.h;
-    o->at[pos].width                    = d->bounds.w;
-    o->at[pos].height                   = d->bounds.h;
-    o->at[pos].value[CP_COARSE]         = (float)(int)d->default_value;
-    o->at[pos].value[CP_FINE]           = d->default_value - (float)(int)d->default_value;
-    o->at[pos].range[0]                 = d->range[0];
-    o->at[pos].range[1]                 = d->range[1];
-    o->at[pos].step[CP_COARSE]          = d->step[CP_COARSE];
-    o->at[pos].step[CP_FINE]            = d->step[CP_FINE];
-    o->at[pos].repaint                  = true;
-    o->at[pos].flags                    = d->flags;
-    o->at[pos].carrier                  = o;
-    o->at[pos].radio_id                 = d->radio_id;
-    o->at[pos].default_value            = d->default_value;
+    s->type                     = d->type;
+    s->subtype                  = d->subtype;
+    s->bounds.l                 = d->bounds.l;
+    s->bounds.t                 = d->bounds.t;
+    s->bounds.r                 = d->bounds.l + d->bounds.w;
+    s->bounds.b                 = d->bounds.t + d->bounds.h;
+    s->width                    = d->bounds.w;
+    s->height                   = d->bounds.h;
+    s->value[CP_COARSE]         = (float)(int)d->default_value;
+    s->value[CP_FINE]           = d->default_value - (float)(int)d->default_value;
+    s->range[0]                 = d->range[0];
+    s->range[1]                 = d->range[1];
+    s->step[CP_COARSE]          = d->step[CP_COARSE];
+    s->step[CP_FINE]            = d->step[CP_FINE];
+    s->repaint                  = true;
+    s->flags                    = d->flags;
+    s->carrier                  = o;
+    s->radio_id                 = d->radio_id;
+    s->default_value            = d->default_value;
 
     for(uint32_t i = 0; i < CT_LIMIT; ++i) {
-        o->at[pos].callback[i] = &fuse_link;
+        s->callback[i] = &fuse_link;
     }
 
     if(!(d->flags & TRANSPARENT)) {
         draw_ltrb_f (
             o->layer[SC],
-            &o->at[pos].bounds,
-            o->at[pos].id
+            &s->bounds,
+            s->id
         );
     }
 
-    init_sector[d->type](&o->at[pos]);
+    init_sector[d->type](s);
+    if(d->type == ST_TEXTBOX) {
+        strncpy(s->data, d->label, TEXTBOX_SIZE);
+    }
+
+    if(d->output) {
+        auto target = find_sector_by_id(o, d->output);
+        if(target)
+            add_mod_link(s, target, CT_VALUE, value_to_textbox);
+    }
 
     auto node = find_sector_by_id(o, d->node_id);
     if(node)
-        link_sector(node, &o->at[pos]);
+        link_sector(node, s);
 
-    return &o->at[pos];
+    return s;
 }
 
 static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
@@ -91,7 +103,18 @@ static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
     desc->step[CP_COARSE]   = (float)s7_real            (s7_list_ref(s7, args, 11));
     desc->step[CP_FINE]     = (float)s7_real            (s7_list_ref(s7, args, 12));
     desc->radio_id          = s7_integer                (s7_list_ref(s7, args, 13));
-    desc->flags             = s7_integer                (s7_list_ref(s7, args, 14));
+    
+    s7_pointer str_arg      = s7_list_ref(s7, args, 14);
+    if (s7_is_string(str_arg)) {
+        const char* tmp     = s7_string(str_arg);
+        desc->label         = strdup(tmp);
+    } 
+    else {
+        desc->label         = NULL;
+    }
+
+    desc->flags             = s7_integer              (s7_list_ref(s7, args, 15));
+    desc->output            = s7_integer              (s7_list_ref(s7, args, 16));
 
     return s7_make_c_pointer(s7, desc);
 }
@@ -123,7 +146,7 @@ void bind_gui_primitives(s7_scheme *s7) {
     s7_define_variable(s7, "TRANSPARENT",           s7_make_integer(s7, TRANSPARENT));
     s7_define_variable(s7, "RADIO",                 s7_make_integer(s7, RADIO));
 
-    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 15, 0, false,
+    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 17, 0, false,
         "(create-sector-descriptor id node_id l t w h width height type subtype default min max step_coarse step_fine radio_id flags)");
 }
 

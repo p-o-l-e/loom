@@ -13,21 +13,8 @@
 #define WIDTH  1280
 #define HEIGHT 720
 
-void timer_callback(union sigval) 
-{
+void timer_callback(union sigval) {
     pthread_cond_signal(&_repaint_condition);
-    //printf("\n[TIMER EXPIRED] 3 seconds passed in the background!\n");
-}
-
-static void slider_call(sector* slider, sector* tbox)
-{
-    char *text = tbox->data;
-    float val = slider->value[CP_COARSE] + slider->value[CP_FINE];
-
-    snprintf(text, 16, "%.3f", val);
-    tbox->repaint = true;
-
-    //printf("Slider callback\n");
 }
 
 int main(int argc, char** argv)
@@ -39,14 +26,11 @@ int main(int argc, char** argv)
     sev = (struct sigevent){0};
     its = (struct itimerspec){0};
 
-
     sev.sigev_notify = SIGEV_THREAD;
     sev.sigev_notify_function = timer_callback;
     sev.sigev_value.sival_ptr = &timer_id;
 
-
-    if (timer_create(CLOCK_REALTIME, &sev, &timer_id) == -1) 
-    {
+    if (timer_create(CLOCK_REALTIME, &sev, &timer_id) == -1) {
         perror("timer_create");
         return 1;
     }
@@ -56,13 +40,12 @@ int main(int argc, char** argv)
     its.it_interval.tv_sec  = 1;
     its.it_interval.tv_nsec = 0;
 
-
     if (timer_settime(timer_id, 0, &its, NULL) == -1) {
         perror("timer_settime");
         timer_delete(timer_id);
         return 1;
     }
-    /* Initialize GUI context */
+
     field context;
     initField(&context, 0, 0, WIDTH, HEIGHT, 36, ROOT);
 
@@ -70,11 +53,8 @@ int main(int argc, char** argv)
 
     s7_scheme* s7 = s7_init();
     bind_gui_primitives(s7);
-    //s7_load(s7, "init.scm");
-    s7_load_embedded(s7, init_scm, "");
-    //s7_eval_c_string(s7, constraints_scm);
-    // s7_eval_c_string(s7, init_scm);
-    //
+    s7_load_embedded(s7, vco_scm, "vco_scm");
+
     s7_pointer list_obj = s7_eval_c_string(s7, "descriptors");
 
     if (s7_is_list(s7, list_obj)) {
@@ -94,8 +74,6 @@ int main(int argc, char** argv)
         }
     }
 
-
     field_loop(&context);
-
     return 0;
 }
