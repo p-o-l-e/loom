@@ -11,144 +11,232 @@
 
 (define descriptors
     (list
-    (create-sector-descriptor
-        NodeID                            ; id
-        0                                 ; node id
-        0 0                               ; left top
-        W H                               ; width height
-        ST_NODE                           ; type
-        SS_A                              ; subtype
-        0.0                               ; default_value
-        -8.0 8.0                          ; range
-        1.0 0.1                           ; step coarse/fine
-        0                                 ; radio_id
-        "VCO"
-        MOVEABLE
-        0)                                ; flags  
+    (sector
+        ID: NodeID
+        NodeID: 0
+        Left: 0
+        Top: 0
+        Width: W
+        Height: H
+        Type: ST_NODE
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: -8.0
+        RangeMax: 8.0
+        StepCoarse: 1.0
+        StepFine: 0.1
+        RadioID: 0
+        Label: "VCO"
+        Flags: MOVEABLE
+        Output: 0)
 
-    (create-sector-descriptor
-        2                                 ; id                      
-        NodeID                            ; node id
-        LeftMargin 8                               ; left top
-        (quotient W 3)                    ; width
-        10                                ; height
-        ST_TEXTBOX                        ; type
-        SS_A                              ; subtype
-        0.0                               ; default_value
-        -8.0 8.0                          ; range
-        1.0 0.1                           ; step coarse/fine
-        0                                 ; radio_id
-        "OSCILLATOR"
-        TRANSPARENT
-        0)                                ; flags      
+    (sector
+        ID: 2
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 8
+        Width: (quotient W 3)
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: -8.0
+        RangeMax: 8.0
+        StepCoarse: 1.0
+        StepFine: 0.1
+        RadioID: 0
+        Label: "OSCILLATOR"
+        Flags: TRANSPARENT
+        Output: 0)
 
-    (create-sector-descriptor
-        3                                 ; id                      
-        NodeID                            ; node id
-        (+ (quotient W 3) 15) (+ 25 VOffset)                              ; left top
-        (quotient W 3)                    ; width
-        10                                ; height
-        ST_TEXTBOX                        ; type
-        SS_A                              ; subtype
-        0.0                               ; default_value
-        0.0 0.0                          ; range
-        0.0 0.0                           ; step coarse/fine
-        0                                 ; radio_id
-        "COARSE"
-        TRANSPARENT
-        0)                      ; flags  
-    
-    (create-sector-descriptor
-        4                                 ; id                      
-        NodeID                            ; node id
-        LeftMargin 25                              ; left top
-        (quotient W 3)                    ; width
-        12                                ; height
-        ST_SLIDER                         ; type
-        SS_A                              ; subtype
-        1.0                               ; default_value
-        1.0 100.0                         ; range
-        1.0 0.1                           ; step coarse/fine
-        0                                 ; radio_id
-        "COARSE"
-        MOVEABLE
-        3)                                ; flags       
+    (sector
+        ID: 3
+        NodeID: NodeID
+        Left: (+ (quotient W 3) 15)
+        Top: (+ 25 VOffset)
+        Width: (quotient W 3)
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 0.0
+        StepCoarse: 0.0
+        StepFine: 0.0
+        RadioID: 0
+        Label: "0.00"
+        Flags: TRANSPARENT
+        Output: 0)
 
-    (create-sector-descriptor
-        5                                 ; id                      
-        NodeID                            ; node id
-        (+ (quotient W 3) 15) (+ 45 VOffset)                              ; left top
-        (quotient W 3)                    ; width
-        10                                ; height
-        ST_TEXTBOX                        ; type
-        SS_A                              ; subtype
-        0.0                               ; default_value
-        0.0 0.0                          ; range
-        0.0 0.0                           ; step coarse/fine
-        0                                 ; radio_id
-        "COARSE"
-        TRANSPARENT
-        0)                      ; flags  
+    (sector
+        ID: 4
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 25
+        Width: (quotient W 3)
+        Height: 12
+        Type: ST_SLIDER
+        SubType: SS_A
+        DefaultValue: 1.0
+        RangeMin: 1.0
+        RangeMax: 100.0
+        StepCoarse: 1.0
+        StepFine: 0.1
+        RadioID: 0
+        Label: "COARSE"
+        Flags: MOVEABLE
+        Output: 3)
 
-    (create-sector-descriptor
-        6                                 ; id                      
-        NodeID                            ; node id
-        LeftMargin 45                              ; left top
-        (quotient W 3)                    ; width
-        12                                ; height
-        ST_SLIDER                         ; type
-        SS_A                              ; subtype
-        1.0                               ; default_value
-        0.01 10.0                         ; range
-        0.1 0.01                          ; step coarse/fine
-        0                                 ; radio_id
-        "FINE"
-        MOVEABLE
-        5)                                ; flags
+    (sector
+        ID: 5
+        NodeID: NodeID
+        Left: (+ (quotient W 3) 15)
+        Top: (+ 45 VOffset)
+        Width: (quotient W 3)
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 0.0
+        StepCoarse: 0.0
+        StepFine: 0.0
+        RadioID: 0
+        Label: "0.0"
+        Flags: TRANSPARENT
+        Output: 0)
 
-    (create-sector-descriptor
-        7                                 ; id
-        NodeID                            ; node id
-        LeftMargin 65                              ; left top
-        10 10                             ; width height
-        ST_CHECKBOX                       ; type
-        SS_B                              ; subtype
-        0.0                               ; default_value
-        0.0 1.0                           ; range
-        1.0 0.0                           ; step coarse/fine
-        1                                 ; radio_id
-        "SWITCH"
-        RADIO
-        0)
+    (sector
+        ID: 6
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 45
+        Width: (quotient W 3)
+        Height: 12
+        Type: ST_SLIDER
+        SubType: SS_A
+        DefaultValue: 1.0
+        RangeMin: 0.01
+        RangeMax: 10.0
+        StepCoarse: 0.1
+        StepFine: 0.01
+        RadioID: 0
+        Label: "FINE"
+        Flags: MOVEABLE
+        Output: 5)
 
-    (create-sector-descriptor
-        8                                 ; id
-        NodeID                            ; node id
-        (+ 14 LeftMargin) 65                              ; left top
-        10 10                             ; width height
-        ST_CHECKBOX                       ; type
-        SS_B                              ; subtype
-        0.0                               ; default_value
-        0.0 1.0                           ; range
-        1.0 0.0                           ; step coarse/fine
-        1                                 ; radio_id
-        "SWITCH"
-        RADIO
-        0)
-    
-    (create-sector-descriptor
-        9                                 ; id
-        NodeID                            ; node id
-        (+ 28 LeftMargin) 65                              ; left top
-        10 10                             ; width height
-        ST_CHECKBOX                       ; type
-        SS_B                              ; subtype
-        0.0                               ; default_value
-        0.0 1.0                           ; range
-        1.0 0.0                           ; step coarse/fine
-        1                                 ; radio_id
-        "SWITCH"
-        RADIO
-        0)
-    )  
+    (sector
+        ID: 7
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 65
+        Width: 10
+        Height: 10
+        Type: ST_CHECKBOX
+        SubType: SS_B
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 1.0
+        StepCoarse: 1.0
+        StepFine: 0.0
+        RadioID: 1
+        Label: "SWITCH"
+        Flags: RADIO
+        Output: 0)
+
+    (sector
+        ID: 8
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 79
+        Width: 10
+        Height: 10
+        Type: ST_CHECKBOX
+        SubType: SS_B
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 1.0
+        StepCoarse: 1.0
+        StepFine: 0.0
+        RadioID: 1
+        Label: "SWITCH"
+        Flags: RADIO
+        Output: 0)
+
+    (sector
+        ID: 9
+        NodeID: NodeID
+        Left: LeftMargin
+        Top: 93
+        Width: 10
+        Height: 10
+        Type: ST_CHECKBOX
+        SubType: SS_B
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 1.0
+        StepCoarse: 1.0
+        StepFine: 0.0
+        RadioID: 1
+        Label: "SWITCH"
+        Flags: RADIO
+        Output: 0)
+
+    (sector
+        ID: 10
+        NodeID: NodeID
+        Left: (+ 28 LeftMargin)
+        Top: 66
+        Width: 40
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 0.0
+        StepCoarse: 0.0
+        StepFine: 0.0
+        RadioID: 0
+        Label: "SINE"
+        Flags: TRANSPARENT
+        Output: 0)
+
+    (sector
+        ID: 11
+        NodeID: NodeID
+        Left: (+ 28 LeftMargin)
+        Top: 80
+        Width: 30
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 0.0
+        StepCoarse: 0.0
+        StepFine: 0.0
+        RadioID: 0
+        Label: "SAW"
+        Flags: TRANSPARENT
+        Output: 0)
+
+    (sector
+        ID: 12
+        NodeID: NodeID
+        Left: (+ 28 LeftMargin)
+        Top: 94
+        Width: 50
+        Height: 10
+        Type: ST_TEXTBOX
+        SubType: SS_A
+        DefaultValue: 0.0
+        RangeMin: 0.0
+        RangeMax: 0.0
+        StepCoarse: 0.0
+        StepFine: 0.0
+        RadioID: 0
+        Label: "SQUARE"
+        Flags: TRANSPARENT
+        Output: 0)
+
 )

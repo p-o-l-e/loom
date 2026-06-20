@@ -3,8 +3,12 @@
 #include "field/field.h"
 #include "s7/s7.h"
 
+const char init_scm[] = {
+    #embed "modules/init.scm"
+};
+
 const char vco_scm[] = {
-#embed "modules/vco.scm"
+    #embed "modules/vco.scm"
 };
 
 typedef struct sector_descriptor sector_descriptor;
