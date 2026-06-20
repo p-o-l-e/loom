@@ -1,7 +1,12 @@
 #pragma once
 #include <stdint.h>
+#include <stdlib.h>
 #include "field/field.h"
 #include "s7/s7.h"
+
+const char layout_scm[] = {
+    #embed "modules/layout.scm"
+};
 
 const char init_scm[] = {
     #embed "modules/init.scm"
@@ -42,7 +47,6 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
     auto s = &o->at[pos];
 
     s->type                     = d->type;
-    s->subtype                  = d->subtype;
     s->bounds.l                 = d->bounds.l;
     s->bounds.t                 = d->bounds.t;
     s->bounds.r                 = d->bounds.l + d->bounds.w;
@@ -53,13 +57,38 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
     s->value[CP_FINE]           = d->default_value - (float)(int)d->default_value;
     s->range[0]                 = d->range[0];
     s->range[1]                 = d->range[1];
-    s->step[CP_COARSE]          = d->step[CP_COARSE];
-    s->step[CP_FINE]            = d->step[CP_FINE];
+
     s->repaint                  = true;
     s->flags                    = d->flags;
     s->carrier                  = o;
-    s->radio_id                 = d->radio_id;
-    s->default_value            = d->default_value;
+
+    switch (d->type) {
+        case ST_CHECKBOX: {
+            s->extension = (checkbox*)malloc(sizeof(checkbox));
+            auto ext = (checkbox*)s->extension;
+            ext->radio_id = d->radio_id;
+        }
+        break;
+
+        case ST_SLIDER: {
+            s->extension = (slider*)malloc(sizeof(slider));
+            auto ext = (slider*)s->extension;
+            ext->type = d->subtype;
+            ext->default_value = d->default_value; 
+            ext->step[CP_COARSE] = d->step[CP_COARSE];
+            ext->step[CP_FINE] = d->step[CP_FINE];
+        }
+        break;
+
+        case ST_SOCKET: {
+            s->extension = (socket*)malloc(sizeof(socket));
+        }
+        break;
+
+        default: 
+        break;
+    
+    }
 
     for(uint32_t i = 0; i < CT_LIMIT; ++i) {
         s->callback[i] = &fuse_link;

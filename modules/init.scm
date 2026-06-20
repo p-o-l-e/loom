@@ -15,7 +15,7 @@
 
 (define-macro (sector . args)
     (let* ((pairs (partition-keywords args))
-        (defaults '((ID:            . 88)
+        (defaults '((ID:            . -1)
                     (NodeID:        . 0)
                     (Left:          . 0)
                     (Top:           . 0)
@@ -25,7 +25,7 @@
                     (SubType:       . 0)
                     (DefaultValue:  . 0.0)
                     (RangeMin:      . 0.0)
-                    (RangeMax:      . 1.0)
+                    (RangeMax:      . 100.0)
                     (StepCoarse:    . 1.0)
                     (StepFine:      . 0.1)
                     (RadioID:       . 0)
