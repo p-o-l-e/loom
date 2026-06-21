@@ -1,7 +1,9 @@
 #pragma once
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "field/field.h"
+#include "modules/modules.h"
 #include "s7/s7.h"
 
 const char layout_scm[] = {
@@ -37,7 +39,7 @@ sector* find_sector_by_id(field* restrict o, uint32_t id) {
     if(!id) return nullptr;
 
     for(uint32_t i = 0; i <= o->sectors; ++i) {
-        if(o->at[i].id == id) return &o->at[i];
+        if(o->at[i].uid == id) return &o->at[i];
     }
     return nullptr;
 }
@@ -46,6 +48,7 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
     auto pos = ++o->sectors;
     auto s = &o->at[pos];
 
+    s->uid                       = d->id;
     s->type                     = d->type;
     s->bounds.l                 = d->bounds.l;
     s->bounds.t                 = d->bounds.t;
@@ -61,6 +64,8 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
     s->repaint                  = true;
     s->flags                    = d->flags;
     s->carrier                  = o;
+
+    printf("Created sector : %u\n", s->index);
 
     switch (d->type) {
         case ST_CHECKBOX: {
@@ -98,7 +103,7 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
         draw_ltrb_f (
             o->layer[SC],
             &s->bounds,
-            s->id
+            s->index
         );
     }
 
@@ -108,9 +113,14 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
     }
 
     if(d->output) {
+        printf("---- Set output : %d\n", d->output);
         auto target = find_sector_by_id(o, d->output);
-        if(target)
+        if(target) {
             add_mod_link(s, target, CT_VALUE, value_to_textbox);
+            printf("---- Target found...\n");
+        }
+        else
+            printf("---- NO Target found...\n");
     }
 
     auto node = find_sector_by_id(o, d->node_id);

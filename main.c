@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include "modules/modules.h"
 #include "scheme.h"
 #define QOI_IMPLEMENTATION
 #include "qoi.h"
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
 
     s7_scheme* s7 = s7_init();
     bind_gui_primitives(s7);
+    bind_module_definitions(s7);
     s7_load_embedded(s7, init_scm, "init_scm");
     s7_load_embedded(s7, layout_scm, "layout_scm");
     s7_load_embedded(s7, vco_scm, "vco_scm");
@@ -65,9 +67,9 @@ int main(int argc, char** argv)
             s7_pointer item = s7_list_ref(s7, list_obj, i);
             if(s7_is_c_pointer(item)) {
                 sector_descriptor* sd = (sector_descriptor*)s7_c_pointer(item);
-                printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u)\n",
+                printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
                     i, sd->id, sd->type,
-                    sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h);
+                    sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
                     createSectorD(&context, sd);
             } 
             else {

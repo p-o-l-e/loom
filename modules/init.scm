@@ -1,3 +1,24 @@
+#|
+ | Returns 32-bit identifier [ AA BB CC DD  ]
+ | AA : Module type
+ | BB : Module id/position
+ | CC : Parameter type
+ | DD : Parameter id/position
+ |#
+
+(define (encode-uid mt mp pt pp)
+  (logior (ash mt 24)
+          (ash mp 16)
+          (ash pt 8)
+          pp))
+
+(define (decode-uid data)
+  (list (logand #xff (ash data -24))  ; mt
+        (logand #xff (ash data -16))  ; mp
+        (logand #xff (ash data -8))   ; pt
+        (logand #xff data)))          ; pp
+
+
 (define (partition-keywords args)
     (let loop ((lst args) (acc '()))
         (if (null? lst)
