@@ -1,6 +1,6 @@
 (define LeftMargin  8)
 (define TopMargin   8)
-(define GridStepX   16)
+(define GridStepX   18)
 (define GridStepY   18)
 
 (define (grid-x value) (+ LeftMargin (* value GridStepX)))

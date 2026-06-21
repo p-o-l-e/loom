@@ -18,6 +18,12 @@
         (logand #xff (ash data -8))   ; pt
         (logand #xff data)))          ; pp
 
+(define (control-counter initial)
+  (let ((n initial))
+    (lambda ()
+      (let ((val n))
+        (set! n (+ n 1))
+        val))))
 
 (define (partition-keywords args)
     (let loop ((lst args) (acc '()))

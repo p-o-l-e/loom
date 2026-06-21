@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     s7_load_embedded(s7, layout_scm, "layout_scm");
     s7_load_embedded(s7, vco_scm, "vco_scm");
 
-    s7_pointer list_obj = s7_eval_c_string(s7, "descriptors");
+    s7_pointer list_obj = s7_eval_c_string(s7, "vco-descriptor");
 
     if (s7_is_list(s7, list_obj)) {
         int len = s7_list_length(s7, list_obj);

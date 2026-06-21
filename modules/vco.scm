@@ -1,11 +1,21 @@
 (define NodeID      1)
 
-(define descriptors
-    (let ((NodeWidth  199) 
-          (NodeHeight 299)
-          (Unit 12)
-          (TBoxCoarse (encode-uid MT_VCO NodeID ST_TEXTBOX 2))
-          (TBoxFine   (encode-uid MT_VCO NodeID ST_TEXTBOX 3)))
+(define vco-descriptor
+    (let*  ((NodeWidth  249) 
+            (NodeHeight 199)
+            (Unit 12)
+            (textbox-id  (control-counter 0))
+            (checkbox-id (control-counter 0))
+            (socket-id   (control-counter 0))
+            (slider-id   (control-counter 0))
+            (TBoxCoarse  (textbox-id))
+            (TBoxFine    (textbox-id))
+            (TBoxPWM     (textbox-id))
+            (TBoxFM      (textbox-id))
+            (TBoxAM      (textbox-id))
+            (TBoxAmp     (textbox-id))
+            )
+
     (list
         (sector
             ID:             NodeID
@@ -18,9 +28,9 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX 1)
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 0)
+            Left:           (grid-x 3)
             Top:            (grid-y 0)
             Width:          (grid-x 9)
             Height:         Unit
@@ -29,211 +39,397 @@
             Flags:          TRANSPARENT
         )
 
+        ;---COARSE--------------------------------------------------------------------------------------------------------------
+
         (sector
-            ID:             TBoxCoarse
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 7)
+            Left:           (grid-x 0)
             Top:            (grid-y 1)
-            Width:          (quotient NodeWidth 3)
+            Width:          (* 6 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            SubType:        SS_A
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       0.0
-            StepCoarse:     0.0
-            StepFine:       0.0
-            RadioID:        0
-            Label:          "0.00"
+            Label:          "COARSE"
             Flags:          TRANSPARENT
-            Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER 1)
+            ID:             TBoxCoarse
             NodeID:         NodeID
-            Left:           (grid-x 0)
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 1)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
             Top:            (grid-y 1)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
-            SubType:        SS_A
+            SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       1.0
             RangeMax:       100.0
             StepCoarse:     1.0
             StepFine:       0.1
-            RadioID:        0
             Label:          "COARSE"
             Flags:          MOVEABLE
             Output:         TBoxCoarse
         )
 
+        ;---FINE----------------------------------------------------------------------------------------------------------------
+
         (sector
-            ID:             TBoxFine
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 7)
+            Left:           (grid-x 0)
             Top:            (grid-y 2)
-            Width:          (quotient NodeWidth 3)
+            Width:          (* 6 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            SubType:        SS_A
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       0.0
-            StepCoarse:     0.0
-            StepFine:       0.0
-            RadioID:        0
-            Label:          "0.0"
-            Flags:          0;TRANSPARENT
-            Output:         0
+            Label:          "  FINE"
+            Flags:          TRANSPARENT
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER 2)
+            ID:             TBoxFine
             NodeID:         NodeID
-            Left:           (grid-x 0)
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 2)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
             Top:            (grid-y 2)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
-            SubType:        SS_A
+            SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       0.01
             RangeMax:       10.0
             StepCoarse:     0.1
             StepFine:       0.01
-            RadioID:        0
             Label:          "FINE"
             Flags:          MOVEABLE
             Output:         TBoxFine
         )
 
+        ;---PWM-----------------------------------------------------------------------------------------------------------------
+        
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX 1)
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
             Left:           (grid-x 0)
             Top:            (grid-y 3)
-            Width:          Unit
+            Width:          (* 6 Unit)
             Height:         Unit
-            Type:           ST_CHECKBOX
-            SubType:        SS_B
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       1.0
-            StepCoarse:     1.0
-            StepFine:       0.0
-            RadioID:        1
-            Label:          "SWITCH"
-            Flags:          RADIO
-            Output:         0
+            Type:           ST_TEXTBOX
+            Label:          "   PWM"
+            Flags:          TRANSPARENT
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX 2)
+            ID:             TBoxPWM
+            NodeID:         NodeID
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 3)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 3)
+            Width:          (* 6 GridStepX)
+            Height:         Unit
+            Type:           ST_SLIDER
+            SubType:        SS_A
+            DefaultValue:   0.00
+            RangeMin:       -1.00
+            RangeMax:       1.00
+            StepCoarse:     0.01
+            StepFine:       0.001
+            Label:          "PWM"
+            Flags:          MOVEABLE
+            Output:         TBoxPWM
+        )
+
+        ;---FM------------------------------------------------------------------------------------------------------------------
+        
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
             Left:           (grid-x 0)
             Top:            (grid-y 4)
-            Width:          Unit
+            Width:          (* 6 Unit)
             Height:         Unit
-            Type:           ST_CHECKBOX
-            SubType:        SS_B
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       1.0
-            StepCoarse:     1.0
-            StepFine:       0.0
-            RadioID:        1
-            Label:          "SWITCH"
-            Flags:          RADIO
-            Output:         0
+            Type:           ST_TEXTBOX
+            Label:          "    FM"
+            Flags:          TRANSPARENT
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX 3)
+            ID:             TBoxFM
+            NodeID:         NodeID
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 4)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 4)
+            Width:          (* 6 GridStepX)
+            Height:         Unit
+            Type:           ST_SLIDER
+            SubType:        SS_B
+            DefaultValue:   0.00
+            RangeMin:       0.00
+            RangeMax:       1.00
+            StepCoarse:     0.01
+            StepFine:       0.001
+            Label:          "FM"
+            Flags:          MOVEABLE
+            Output:         TBoxFM
+        )
+
+        ;---AM------------------------------------------------------------------------------------------------------------------
+        
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
             Left:           (grid-x 0)
             Top:            (grid-y 5)
+            Width:          (* 6 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "    AM"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             TBoxAM
+            NodeID:         NodeID
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 5)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 5)
+            Width:          (* 6 GridStepX)
+            Height:         Unit
+            Type:           ST_SLIDER
+            SubType:        SS_B
+            DefaultValue:   0.00
+            RangeMin:       0.00
+            RangeMax:       1.00
+            StepCoarse:     0.01
+            StepFine:       0.001
+            Label:          "AM"
+            Flags:          MOVEABLE
+            Output:         TBoxAM
+        )
+
+        ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
+        
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
+            NodeID:         NodeID
+            Left:           (grid-x 0)
+            Top:            (grid-y 6)
+            Width:          (* 6 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "   AMP"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             TBoxAmp
+            NodeID:         NodeID
+            Left:           (- (grid-x 10) Unit)
+            Top:            (grid-y 6)
+            Width:          (* 4 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "0.00"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 6)
+            Width:          (* 6 GridStepX)
+            Height:         Unit
+            Type:           ST_SLIDER
+            SubType:        SS_B
+            DefaultValue:   0.00
+            RangeMin:       0.00
+            RangeMax:       1.00
+            StepCoarse:     0.01
+            StepFine:       0.001
+            Label:          "AMP"
+            Flags:          MOVEABLE
+            Output:         TBoxAmp
+        )
+
+        ;---SWITCHES------------------------------------------------------------------------------------------------------------
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 7)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
-            SubType:        SS_B
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       1.0
-            StepCoarse:     1.0
-            StepFine:       0.0
-            RadioID:        1
+            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX 4)
+            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 1)
-            Top:            (grid-y 3)
-            Width:          40
+            Left:           (grid-x 3)
+            Top:            (grid-y 8)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_CHECKBOX
+            SubType:        SS_B
+            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
+            Label:          "SWITCH"
+            Flags:          RADIO
+            Output:         0
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
+            NodeID:         NodeID
+            Left:           (grid-x 3)
+            Top:            (grid-y 9)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_CHECKBOX
+            SubType:        SS_B
+            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
+            Label:          "SWITCH"
+            Flags:          RADIO
+            Output:         0
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
+            NodeID:         NodeID
+            Left:           (grid-x 4)
+            Top:            (grid-y 7)
+            Width:          (* 4 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            SubType:        SS_A
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       0.0
-            StepCoarse:     0.0
-            StepFine:       0.0
-            RadioID:        0
             Label:          "SINE"
             Flags:          TRANSPARENT
-            Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX 5)
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 1)
-            Top:            (grid-y 4)
-            Width:          (* Unit 3)
+            Left:           (grid-x 4)
+            Top:            (grid-y 8)
+            Width:          (* 3 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            SubType:        SS_A
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       0.0
-            StepCoarse:     0.0
-            StepFine:       0.0
-            RadioID:        0
             Label:          "SAW"
             Flags:          TRANSPARENT
-            Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX 6)
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
-            Left:           (grid-x 1)
-            Top:            (grid-y 5)
-            Width:          50
+            Left:           (grid-x 4)
+            Top:            (grid-y 9)
+            Width:          (* 6 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            SubType:        SS_A
-            DefaultValue:   0.0
-            RangeMin:       0.0
-            RangeMax:       0.0
-            StepCoarse:     0.0
-            StepFine:       0.0
-            RadioID:        0
             Label:          "SQUARE"
             Flags:          TRANSPARENT
-            Output:         0
+        )
+
+        ;---INPUTS--------------------------------------------------------------------------------------------------------------
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
+            NodeID:         NodeID
+            Left:           (grid-x 0)
+            Top:            (grid-y 3)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_SOCKET
+            Flags:          (logior INTERCON INPUT MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET 0)
+            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
             NodeID:         NodeID
-            Left:           (grid-x 11)
+            Left:           (grid-x 0)
+            Top:            (grid-y 4)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_SOCKET
+            Flags:          (logior INTERCON INPUT MOVEABLE)
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
+            NodeID:         NodeID
+            Left:           (grid-x 0)
             Top:            (grid-y 5)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_SOCKET
+            Flags:          (logior INTERCON INPUT MOVEABLE)
+        )
+
+        ;---OUTPUTS-------------------------------------------------------------------------------------------------------------
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
+            NodeID:         NodeID
+            Left:           (grid-x 12)
+            Top:            (grid-y 8)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
@@ -241,25 +437,38 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET 1)
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
             NodeID:         NodeID
             Left:           (grid-x 11)
-            Top:            (grid-y 6)
+            Top:            (grid-y 8)
             Width:          Unit
             Height:         Unit
-            Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            Type:           ST_TEXTBOX
+            Label:          "X"
+            Flags:          TRANSPARENT
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET 2)
+            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
             NodeID:         NodeID
-            Left:           (grid-x 11)
-            Top:            (grid-y 7)
+            Left:           (grid-x 12)
+            Top:            (grid-y 9)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            Flags:          (logior INTERCON OUTPUT MOVEABLE)
+        )
+
+        (sector
+            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
+            NodeID:         NodeID
+            Left:           (grid-x 11)
+            Top:            (grid-y 9)
+            Width:          Unit
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "Y"
+            Flags:          TRANSPARENT
         )
     ))
 )
