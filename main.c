@@ -70,7 +70,7 @@ int main(int argc, char** argv)
                 printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
                     i, sd->id, sd->type,
                     sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
-                    createSectorD(&context, sd);
+                    createSector(&context, sd);
             } 
             else {
                 fprintf(stderr, "Item %d is not a C pointer!\n", i);

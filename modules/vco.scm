@@ -8,12 +8,12 @@
             (checkbox-id (control-counter 0))
             (socket-id   (control-counter 0))
             (slider-id   (control-counter 0))
-            (TBoxCoarse  (textbox-id))
-            (TBoxFine    (textbox-id))
-            (TBoxPWM     (textbox-id))
-            (TBoxFM      (textbox-id))
-            (TBoxAM      (textbox-id))
-            (TBoxAmp     (textbox-id))
+            (TBoxCoarse  (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxFine    (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxPWM     (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxFM      (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxAM      (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxAmp     (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
             )
 
     (list
@@ -62,7 +62,7 @@
             Height:         Unit
             Type:           ST_TEXTBOX
             Label:          "0.00"
-            Flags:          TRANSPARENT
+            Flags:          0;TRANSPARENT
         )
 
         (sector
@@ -107,7 +107,7 @@
             Height:         Unit
             Type:           ST_TEXTBOX
             Label:          "0.00"
-            Flags:          TRANSPARENT
+            Flags:          0;TRANSPARENT
         )
 
         (sector
@@ -152,7 +152,7 @@
             Height:         Unit
             Type:           ST_TEXTBOX
             Label:          "0.00"
-            Flags:          TRANSPARENT
+            Flags:          0;TRANSPARENT
         )
 
         (sector
