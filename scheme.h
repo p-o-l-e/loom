@@ -18,9 +18,9 @@ const char vco_scm[] = {
     #embed "modules/vco.scm"
 };
 
-typedef struct sector_descriptor sector_descriptor;
+typedef struct SectorDescriptor SectorDescriptor;
 
-struct sector_descriptor {
+struct SectorDescriptor {
     uint32_t    id;
     uint32_t    node_id;
     ltwh32u     bounds;
@@ -35,17 +35,17 @@ struct sector_descriptor {
     uint32_t    output;
 };
 
-sector* find_sector_by_id(field* restrict o, uint32_t id) {
+Entity* find_sector_by_id(Field* restrict o, uint32_t id) {
     if(!id) return nullptr;
 
-    for(uint32_t i = 0; i <= o->sectors; ++i) {
+    for(uint32_t i = 0; i <= o->Entitys; ++i) {
         if(o->at[i].uid == id) return &o->at[i];
     }
     return nullptr;
 }
 
-sector* createSectorD(field* restrict o, sector_descriptor* d) {
-    auto pos = ++o->sectors;
+Entity* createSectorD(Field* restrict o, SectorDescriptor* d) {
+    auto pos = ++o->Entitys;
     auto s = &o->at[pos];
 
     s->uid                       = d->id;
@@ -69,15 +69,15 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
 
     switch (d->type) {
         case ST_CHECKBOX: {
-            s->extension = (checkbox*)malloc(sizeof(checkbox));
-            auto ext = (checkbox*)s->extension;
+            s->extension = (Checkbox*)malloc(sizeof(Checkbox));
+            auto ext = (Checkbox*)s->extension;
             ext->radio_id = d->radio_id;
         }
         break;
 
         case ST_SLIDER: {
-            s->extension = (slider*)malloc(sizeof(slider));
-            auto ext = (slider*)s->extension;
+            s->extension = (Slider*)malloc(sizeof(Slider));
+            auto ext = (Slider*)s->extension;
             ext->type = d->subtype;
             ext->default_value = d->default_value; 
             ext->step[CP_COARSE] = d->step[CP_COARSE];
@@ -86,7 +86,7 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
         break;
 
         case ST_SOCKET: {
-            s->extension = (socket*)malloc(sizeof(socket));
+            s->extension = (Socket*)malloc(sizeof(Socket));
         }
         break;
 
@@ -131,7 +131,7 @@ sector* createSectorD(field* restrict o, sector_descriptor* d) {
 }
 
 static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
-    sector_descriptor* desc = (sector_descriptor*)malloc(sizeof(sector_descriptor));
+    SectorDescriptor* desc = (SectorDescriptor*)malloc(sizeof(SectorDescriptor));
     desc->id                = s7_integer                (s7_list_ref(s7, args, 0));
     desc->node_id           = s7_integer                (s7_list_ref(s7, args, 1));
     desc->bounds.l          = s7_integer                (s7_list_ref(s7, args, 2));
@@ -162,7 +162,7 @@ static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
     return s7_make_c_pointer(s7, desc);
 }
 
-void bind_gui_primitives(s7_scheme *s7) {
+void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "ST_SLIDER",             s7_make_integer(s7, ST_SLIDER));
     s7_define_variable(s7, "ST_ROTARY",             s7_make_integer(s7, ST_ROTARY));
     s7_define_variable(s7, "ST_SPRITE_INF_SLIDER",  s7_make_integer(s7, ST_SPRITE_INF_SLIDER));

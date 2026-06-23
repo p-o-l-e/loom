@@ -9,7 +9,7 @@ typedef enum {
 
 } ModuleType;
 
-void bind_module_definitions(s7_scheme *s7) {
+void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "MT_FUSE", s7_make_integer(s7, MT_FUSE));
     s7_define_variable(s7, "MT_VCO", s7_make_integer(s7, MT_VCO));
     s7_define_variable(s7, "MT_LIMIT", s7_make_integer(s7, MT_LIMIT));
