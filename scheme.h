@@ -18,9 +18,6 @@ const char vco_scm[] = {
     #embed "modules/vco.scm"
 };
 
-
-
-
 static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
     SectorDescriptor* desc = (SectorDescriptor*)malloc(sizeof(SectorDescriptor));
     desc->id                = s7_integer                (s7_list_ref(s7, args, 0));

@@ -47,8 +47,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Field context;
-    initField(&context, 0, 0, WIDTH, HEIGHT, 36, ROOT);
+    Field* context = createField(0, 0, WIDTH, HEIGHT, 36, ROOT);
 
     printf("[MAIN] initField\n");
 
@@ -70,7 +69,7 @@ int main(int argc, char** argv)
                 printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
                     i, sd->id, sd->type,
                     sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
-                    createSector(&context, sd);
+                    createSector(context, sd);
             } 
             else {
                 fprintf(stderr, "Item %d is not a C pointer!\n", i);
@@ -78,6 +77,6 @@ int main(int argc, char** argv)
         }
     }
 
-    field_loop(&context);
+    field_loop(context);
     return 0;
 }
