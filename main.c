@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     s7_pointer list_obj = s7_eval_c_string(s7, "vco-descriptor");
 
     if (s7_is_list(s7, list_obj)) {
-        auto vco = createNode(context, 299, 199, 32);
+        auto vco = createNode(context, 299, 199, 35);
         int len = s7_list_length(s7, list_obj);
         for(int i = 0; i < len; i++) {
             s7_pointer item = s7_list_ref(s7, list_obj, i);
