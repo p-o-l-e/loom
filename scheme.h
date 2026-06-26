@@ -52,6 +52,7 @@ static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
 
 void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "ST_SLIDER",             s7_make_integer(s7, ST_SLIDER));
+    s7_define_variable(s7, "ST_ENCODER",            s7_make_integer(s7, ST_ENCODER));
     s7_define_variable(s7, "ST_ROTARY",             s7_make_integer(s7, ST_ROTARY));
     s7_define_variable(s7, "ST_SPRITE_INF_SLIDER",  s7_make_integer(s7, ST_SPRITE_INF_SLIDER));
     s7_define_variable(s7, "ST_SOCKET",             s7_make_integer(s7, ST_SOCKET));
@@ -65,6 +66,7 @@ void bindGuiConstants(s7_scheme *s7) {
 
     s7_define_variable(s7, "SS_A",                  s7_make_integer(s7, SS_A));
     s7_define_variable(s7, "SS_B",                  s7_make_integer(s7, SS_B));
+    s7_define_variable(s7, "SS_C",                  s7_make_integer(s7, SS_C));
 
     s7_define_variable(s7, "CP_COARSE",             s7_make_integer(s7, CP_COARSE));
     s7_define_variable(s7, "CP_FINE",               s7_make_integer(s7, CP_FINE));

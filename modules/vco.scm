@@ -7,6 +7,7 @@
             (textbox-id  (control-counter 0))
             (checkbox-id (control-counter 0))
             (socket-id   (control-counter 0))
+            (encoder-id  (control-counter 0))
             (slider-id   (control-counter 0))
             (TBoxCoarse  (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
             (TBoxFine    (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
@@ -156,19 +157,19 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
+            ID:             (encode-uid MT_VCO NodeID ST_ENCODER (encoder-id))
             NodeID:         NodeID
             Left:           (grid-x 3)
             Top:            (grid-y 3)
             Width:          (* 6 GridStepX)
             Height:         Unit
-            Type:           ST_SLIDER
+            Type:           ST_ENCODER
             SubType:        SS_A
             DefaultValue:   0.00
             RangeMin:       -1.00
             RangeMax:       1.00
-            StepCoarse:     0.01
-            StepFine:       0.001
+            StepCoarse:     0.1
+            StepFine:       0.01
             Label:          "PWM"
             Flags:          MOVEABLE
             Output:         TBoxPWM
