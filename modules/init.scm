@@ -64,3 +64,6 @@
          )
     `(create-sector-descriptor ,@(merge-defaults defaults pairs))))
 
+
+(define (sectors-count descriptor)
+  (length descriptor))

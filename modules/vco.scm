@@ -1,10 +1,9 @@
-(define NodeID      1)
+(define NodeID 1)
+(define vco-width 249) 
+(define vco-height 199)
 
 (define vco-descriptor
-    (let*  ((NodeWidth  249) 
-            (NodeHeight 199)
-            (Unit 12)
-            (textbox-id  (control-counter 0))
+    (let*  ((textbox-id  (control-counter 0))
             (checkbox-id (control-counter 0))
             (socket-id   (control-counter 0))
             (encoder-id  (control-counter 0))
@@ -20,8 +19,8 @@
     (list
         (sector
             ID:             NodeID
-            Width:          NodeWidth
-            Height:         NodeHeight
+            Width:          vco-width
+            Height:         vco-height
             Type:           ST_NODE
             SubType:        SS_A
             Label:          "VCO"

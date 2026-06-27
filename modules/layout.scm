@@ -1,3 +1,5 @@
+(define Unit 12)
+
 (define LeftMargin  8)
 (define TopMargin   8)
 (define GridStepX   18)
