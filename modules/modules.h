@@ -40,25 +40,25 @@ static int load_descriptor(s7_scheme* s7, const char* prefix, s7_pointer* out) {
     return 0;
 }
 
-static int load_module(s7_scheme* s7, Field* context, const char* prefix) {
+static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     int w, h;
-    if (load_dimension(s7, prefix, "width", &w) < 0) return -1;
-    if (load_dimension(s7, prefix, "height", &h) < 0) return -1;
+    if (load_dimension(s7, prefix, "width", &w) < 0) return nullptr;
+    if (load_dimension(s7, prefix, "height", &h) < 0) return nullptr;
 
     s7_pointer list_obj;
-    if (load_descriptor(s7, prefix, &list_obj) < 0) return -1;
+    if (load_descriptor(s7, prefix, &list_obj) < 0) return nullptr;
 
     char buf[256];
     snprintf(buf, sizeof(buf), "(sectors-count %s-descriptor)", prefix);
     s7_pointer cnt_obj = s7_eval_c_string(s7, buf);
     if (!s7_is_integer(cnt_obj)) {
         fprintf(stderr, "[load_module] sectors-count failed for '%s'\n", prefix);
-        return -1;
+        return nullptr;
     }
     auto entities = s7_integer(cnt_obj);
     printf("---- Entities : %lld\n", entities);
 
-    auto vco = ffCreateNode(context, w, h, entities);
+    auto node = ffCreateNode(context, w, h, entities);
     int len = s7_list_length(s7, list_obj);
     for (int i = 0; i < len; i++) {
         s7_pointer item = s7_list_ref(s7, list_obj, i);
@@ -70,10 +70,10 @@ static int load_module(s7_scheme* s7, Field* context, const char* prefix) {
         printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
             i, sd->id, sd->type,
             sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
-        ffCreateEntity(vco, sd);
+        ffCreateEntity(node, sd);
     }
 
     snprintf(buf, sizeof(buf), "(set! %s-id (+ %s-id 1))", prefix, prefix);
     s7_eval_c_string(s7, buf);
-    return 0;
+    return node;
 }

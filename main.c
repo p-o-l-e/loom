@@ -58,7 +58,8 @@ int main(int argc, char** argv)
     s7_load_embedded(s7, layout_scm, "layout_scm");
     s7_load_embedded(s7, vco_scm, "vco_scm");
 
-    load_module(s7, context, "vco");
+    auto vco = load_module(s7, context, "vco");
+    ffPlaceNode(context, vco, 250, 100);
 
     field_loop(context);
     return 0;
