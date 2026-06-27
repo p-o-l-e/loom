@@ -73,5 +73,7 @@ static int load_module(s7_scheme* s7, Field* context, const char* prefix) {
         createEntity(vco, sd);
     }
 
+    snprintf(buf, sizeof(buf), "(set! %s-id (+ %s-id 1))", prefix, prefix);
+    s7_eval_c_string(s7, buf);
     return 0;
 }

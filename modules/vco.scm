@@ -1,4 +1,4 @@
-(define NodeID 1)
+(define vco-id 0)
 (define vco-width 249) 
 (define vco-height 199)
 
@@ -8,17 +8,17 @@
             (socket-id   (control-counter 0))
             (encoder-id  (control-counter 0))
             (slider-id   (control-counter 0))
-            (TBoxCoarse  (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
-            (TBoxFine    (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
-            (TBoxPWM     (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
-            (TBoxFM      (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
-            (TBoxAM      (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
-            (TBoxAmp     (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id)))
+            (TBoxCoarse  (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+            (TBoxFine    (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+            (TBoxPWM     (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+            (TBoxFM      (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+            (TBoxAM      (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+            (TBoxAmp     (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
             )
 
     (list
         (sector
-            ID:             NodeID
+            ID:             vco-id
             Width:          vco-width
             Height:         vco-height
             Type:           ST_NODE
@@ -28,8 +28,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 0)
             Width:          (grid-x 9)
@@ -42,8 +42,8 @@
         ;---COARSE--------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 1)
             Width:          (* 6 Unit)
@@ -55,7 +55,7 @@
 
         (sector
             ID:             TBoxCoarse
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 1)
             Width:          (* 4 Unit)
@@ -66,8 +66,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 1)
             Width:          (* 6 GridStepX)
@@ -87,8 +87,8 @@
         ;---FINE----------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 2)
             Width:          (* 6 Unit)
@@ -100,7 +100,7 @@
 
         (sector
             ID:             TBoxFine
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 2)
             Width:          (* 4 Unit)
@@ -111,8 +111,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 2)
             Width:          (* 6 GridStepX)
@@ -132,8 +132,8 @@
         ;---PWM-----------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 3)
             Width:          (* 6 Unit)
@@ -145,7 +145,7 @@
 
         (sector
             ID:             TBoxPWM
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 3)
             Width:          (* 4 Unit)
@@ -156,8 +156,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_ENCODER (encoder-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_ENCODER (encoder-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 3)
             Width:          (* 6 GridStepX)
@@ -177,8 +177,8 @@
         ;---FM------------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
             Width:          (* 6 Unit)
@@ -190,7 +190,7 @@
 
         (sector
             ID:             TBoxFM
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 4)
             Width:          (* 4 Unit)
@@ -201,8 +201,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 4)
             Width:          (* 6 GridStepX)
@@ -222,8 +222,8 @@
         ;---AM------------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
             Width:          (* 6 Unit)
@@ -235,7 +235,7 @@
 
         (sector
             ID:             TBoxAM
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 5)
             Width:          (* 4 Unit)
@@ -246,8 +246,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 5)
             Width:          (* 6 GridStepX)
@@ -267,8 +267,8 @@
         ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 6)
             Width:          (* 6 Unit)
@@ -280,7 +280,7 @@
 
         (sector
             ID:             TBoxAmp
-            NodeID:         NodeID
+            NodeID:         vco-id
             Left:           (- (grid-x 10) Unit)
             Top:            (grid-y 6)
             Width:          (* 4 Unit)
@@ -291,8 +291,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SLIDER (slider-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 6)
             Width:          (* 6 GridStepX)
@@ -311,52 +311,52 @@
 
         ;---SWITCHES------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 7)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
-            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
+            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 8)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
             SubType:        SS_B
-            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
+            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_CHECKBOX (checkbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 9)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
             SubType:        SS_B
-            RadioID:        (encode-uid MT_VCO NodeID ST_CHECKBOX 0)
+            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 7)
             Width:          (* 4 Unit)
@@ -367,8 +367,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 8)
             Width:          (* 3 Unit)
@@ -379,8 +379,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 9)
             Width:          (* 6 Unit)
@@ -392,8 +392,8 @@
 
         ;---INPUTS--------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 3)
             Width:          Unit
@@ -403,8 +403,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
             Width:          Unit
@@ -414,8 +414,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
             Width:          Unit
@@ -426,8 +426,8 @@
 
         ;---OUTPUTS-------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            NodeID:         vco-id
             Left:           (grid-x 12)
             Top:            (grid-y 8)
             Width:          Unit
@@ -437,8 +437,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 11)
             Top:            (grid-y 8)
             Width:          Unit
@@ -449,8 +449,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_SOCKET (socket-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            NodeID:         vco-id
             Left:           (grid-x 12)
             Top:            (grid-y 9)
             Width:          Unit
@@ -460,8 +460,8 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO NodeID ST_TEXTBOX (textbox-id))
-            NodeID:         NodeID
+            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            NodeID:         vco-id
             Left:           (grid-x 11)
             Top:            (grid-y 9)
             Width:          Unit
