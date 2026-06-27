@@ -58,7 +58,7 @@ static int load_module(s7_scheme* s7, Field* context, const char* prefix) {
     auto entities = s7_integer(cnt_obj);
     printf("---- Entities : %lld\n", entities);
 
-    auto vco = createNode(context, w, h, entities);
+    auto vco = ffCreateNode(context, w, h, entities);
     int len = s7_list_length(s7, list_obj);
     for (int i = 0; i < len; i++) {
         s7_pointer item = s7_list_ref(s7, list_obj, i);
@@ -70,7 +70,7 @@ static int load_module(s7_scheme* s7, Field* context, const char* prefix) {
         printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
             i, sd->id, sd->type,
             sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
-        createEntity(vco, sd);
+        ffCreateEntity(vco, sd);
     }
 
     snprintf(buf, sizeof(buf), "(set! %s-id (+ %s-id 1))", prefix, prefix);

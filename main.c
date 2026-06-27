@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Field* context = createField(0, 0, WIDTH, HEIGHT, 2, ROOT);
+    Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 2, ROOT);
 
     printf("[MAIN] initField\n");
 
