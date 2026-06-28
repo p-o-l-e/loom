@@ -6,17 +6,6 @@
 #include "modules/modules.h"
 #include "s7/s7.h"
 
-const char layout_scm[] = {
-    #embed "modules/layout.scm"
-};
-
-const char init_scm[] = {
-    #embed "modules/init.scm"
-};
-
-const char vco_scm[] = {
-    #embed "modules/vco.scm"
-};
 
 static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
     SectorDescriptor* desc = (SectorDescriptor*)malloc(sizeof(SectorDescriptor));

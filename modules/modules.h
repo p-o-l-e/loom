@@ -2,8 +2,25 @@
 #include "../s7/s7.h"
 #include "../field/field.h"
 
+const char layout_scm[] = {
+    #embed "layout.scm"
+};
+
+const char init_scm[] = {
+    #embed "init.scm"
+};
+
+const char vco_scm[] = {
+    #embed "vco.scm"
+};
+
+const char generator_scm[] = {
+    #embed "generator.scm"
+};
+
 typedef enum {
     MT_FUSE,
+    MT_GENERATOR,
     MT_VCO,
 
     MT_LIMIT
@@ -12,6 +29,7 @@ typedef enum {
 
 void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "MT_FUSE", s7_make_integer(s7, MT_FUSE));
+    s7_define_variable(s7, "MT_GENERATOR", s7_make_integer(s7, MT_GENERATOR));
     s7_define_variable(s7, "MT_VCO", s7_make_integer(s7, MT_VCO));
     s7_define_variable(s7, "MT_LIMIT", s7_make_integer(s7, MT_LIMIT));
 }

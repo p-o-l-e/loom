@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 2, ROOT);
+    Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 3, ROOT);
 
     printf("[MAIN] initField\n");
 
@@ -57,9 +57,12 @@ int main(int argc, char** argv)
     s7_load_embedded(s7, init_scm, "init_scm");
     s7_load_embedded(s7, layout_scm, "layout_scm");
     s7_load_embedded(s7, vco_scm, "vco_scm");
+    s7_load_embedded(s7, generator_scm, "generator_scm");
 
     auto vco = load_module(s7, context, "vco");
-    ffPlaceNode(context, vco, 250, 100);
+    auto vco2 = load_module(s7, context, "generator");
+    ffPlaceNode(context, vco, 200, 0);
+    ffPlaceNode(context, vco2, 500, 0);
 
     field_loop(context);
     return 0;
