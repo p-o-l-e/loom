@@ -52,6 +52,7 @@ void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "ST_MOMENTARY",          s7_make_integer(s7, ST_MOMENTARY));
     s7_define_variable(s7, "ST_TEXTBOX",            s7_make_integer(s7, ST_TEXTBOX));
     s7_define_variable(s7, "ST_NODE",               s7_make_integer(s7, ST_NODE));
+    s7_define_variable(s7, "ST_CRT",                s7_make_integer(s7, ST_CRT));
 
     s7_define_variable(s7, "SS_A",                  s7_make_integer(s7, SS_A));
     s7_define_variable(s7, "SS_B",                  s7_make_integer(s7, SS_B));

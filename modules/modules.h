@@ -18,10 +18,15 @@ const char generator_scm[] = {
     #embed "generator.scm"
 };
 
+const char crt_scm[] = {
+    #embed "crt.scm"
+};
+
 typedef enum {
     MT_FUSE,
     MT_GENERATOR,
     MT_VCO,
+    MT_CRT,
 
     MT_LIMIT
 
@@ -31,6 +36,7 @@ void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "MT_FUSE", s7_make_integer(s7, MT_FUSE));
     s7_define_variable(s7, "MT_GENERATOR", s7_make_integer(s7, MT_GENERATOR));
     s7_define_variable(s7, "MT_VCO", s7_make_integer(s7, MT_VCO));
+    s7_define_variable(s7, "MT_CRT", s7_make_integer(s7, MT_CRT));
     s7_define_variable(s7, "MT_LIMIT", s7_make_integer(s7, MT_LIMIT));
 }
 
