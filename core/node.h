@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include "uid.h"
-#include "generator.h"
-#include "modules.h"
 
 static float const fuse = 0.0f;
 constexpr float pi  = 3.14159265358979323846f;
@@ -17,6 +15,7 @@ typedef struct core_rack core_rack;
 typedef enum {
     CMT_FUSE,
     CMT_GENERATOR,
+    CMT_CRT,
 } core_module_type;
 
 struct core_descriptor {
@@ -29,8 +28,8 @@ struct core_node {
     float const** ccv;
     float const** icv;
     float* ocv;
-    void (* const process)(core_node* this);
-    core_descriptor const* const descriptor;
+    void (*process)(core_node* this);
+    core_descriptor const* descriptor;
     void* data;
     bool bypass;
     uint32_t uid;
@@ -43,47 +42,28 @@ struct core_rack {
     uint32_t capacity;
 };
 
-static inline void core_init_node(core_node* node, core_module_type type, uint32_t id) {
-    node->ccv = malloc(node->descriptor->cc * sizeof(float*));
-    node->icv = malloc(node->descriptor->ic * sizeof(float*));
-    node->ocv = malloc(node->descriptor->oc * sizeof(float));
+static inline void core_init_node(core_node* node, core_module_type type, core_descriptor const* descriptor, void* data, void (*process)(core_node*), uint32_t id) {
+    node->type = type;
+    node->descriptor = descriptor;
+    node->data = data;
+    node->process = process;
+    node->bypass = false;
 
-    for(uint32_t i = 0; i < node->descriptor->cc; ++i) node->ccv[i] = &fuse;
-    for(uint32_t i = 0; i < node->descriptor->ic; ++i) node->icv[i] = &fuse;
+    node->ccv = malloc(descriptor->cc * sizeof(float*));
+    node->icv = malloc(descriptor->ic * sizeof(float*));
+    node->ocv = malloc(descriptor->oc * sizeof(float));
 
-    switch (type) {
-        case CMT_FUSE:
-            break;
-
-        case CMT_GENERATOR:
-            node->data = malloc(sizeof(core_generator));
-            break;
-
-        default:
-            node->data = nullptr;
-            break;
-    }
+    for(uint32_t i = 0; i < descriptor->cc; ++i) node->ccv[i] = &fuse;
+    for(uint32_t i = 0; i < descriptor->ic; ++i) node->icv[i] = &fuse;
 
     node->uid = id;
-
 }
 
 static inline void core_destroy_node(core_node* node) {
     free(node->ocv);
     free((void*)node->icv);
     free((void*)node->ccv);
-
-    switch (node->type) {
-        case CMT_FUSE:
-            break;
-
-        case CMT_GENERATOR:
-            free(node->data);
-            break;
-
-        default:
-            break;
-    }
+    if(node->data) free(node->data);
 }
 
 static inline core_rack* core_create_rack(uint32_t capacity) {

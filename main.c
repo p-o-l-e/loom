@@ -1,18 +1,17 @@
-#include "field/field.h"
-#include "field/field_glfw.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include "modules/modules.h"
-#include "scheme.h"
+#include "bridge.h"
 #define QOI_IMPLEMENTATION
 #include "qoi.h"
 
 #define WIDTH  1280
 #define HEIGHT 720
+#define RACK_CAPACITY 16
+#define FPS 30
 
 void timer_callback(union sigval) {
     pthread_cond_signal(&_repaint_condition);
@@ -60,6 +59,8 @@ int main(int argc, char** argv)
     s7_load_embedded(s7, generator_scm, "generator_scm");
     s7_load_embedded(s7, crt_scm, "crt_scm");
 
+    core_rack* rack = core_create_rack(RACK_CAPACITY);
+
     auto vco = load_module(s7, context, "vco");
     auto gen = load_module(s7, context, "generator");
     auto crt = load_module(s7, context, "crt");
@@ -67,6 +68,11 @@ int main(int argc, char** argv)
     ffPlaceNode(context, gen, 500, 0);
     ffPlaceNode(context, crt, 500, 300);
 
+    core_thread* pt = core_start(rack, FPS);
+
     field_loop(context);
+
+    core_stop(pt);
+    core_destroy_rack(rack);
     return 0;
 }

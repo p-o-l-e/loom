@@ -1,5 +1,5 @@
 (define crt-id 0)
-(define crt-width 299) 
+(define crt-width 324) 
 (define crt-height 224)
 
 (define crt-descriptor
