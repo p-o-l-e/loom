@@ -2,7 +2,7 @@
 (define generator-width 249) 
 (define generator-height 99)
 
-(define generator-descriptor
+(define (generator-descriptor)
     (let*  ((static-id   (control-counter 0))
             (control-id  (control-counter 0))
             (input-id    (control-counter 0))
@@ -12,6 +12,8 @@
             (TBoxAmp     (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id)))
             )
 
+    (format #t "Module-ID : ~s ~%" generator-id) ;; In main.c we create 3 generators but this line printed once
+    (format #t "TBoxAmp   : ~X~%" TBoxAmp) ;; In main.c we create 3 generators but this line printed once
     (list
         (sector
             ID:             generator-id

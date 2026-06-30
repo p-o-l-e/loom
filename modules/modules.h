@@ -2,6 +2,7 @@
 #include "../core/common.h"
 #include "../s7/s7.h"
 #include "../field/field.h"
+#include <stdio.h>
 
 const char layout_scm[] = {
     #embed "layout.scm"
@@ -45,7 +46,7 @@ static int load_dimension(s7_scheme* s7, const char* prefix, const char* suffix,
 
 static int load_descriptor(s7_scheme* s7, const char* prefix, s7_pointer* out) {
     char buf[256];
-    snprintf(buf, sizeof(buf), "%s-descriptor", prefix);
+    snprintf(buf, sizeof(buf), "(%s-descriptor)", prefix);
     s7_pointer obj = s7_eval_c_string(s7, buf);
     if (!s7_is_list(s7, obj)) {
         fprintf(stderr, "[load_module] '%s' is not a list\n", buf);
@@ -63,14 +64,8 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     s7_pointer list_obj;
     if (load_descriptor(s7, prefix, &list_obj) < 0) return nullptr;
 
+    int entities = s7_list_length(s7, list_obj);
     char buf[256];
-    snprintf(buf, sizeof(buf), "(sectors-count %s-descriptor)", prefix);
-    s7_pointer cnt_obj = s7_eval_c_string(s7, buf);
-    if (!s7_is_integer(cnt_obj)) {
-        fprintf(stderr, "[load_module] sectors-count failed for '%s'\n", prefix);
-        return nullptr;
-    }
-    auto entities = s7_integer(cnt_obj);
     //printf("---- Entities : %lld\n", entities);
 
     auto node = ffCreateNode(context, w, h, entities);
@@ -91,7 +86,16 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
         ffCreateEntity(node, sd);
     }
 
-    snprintf(buf, sizeof(buf), "(set! %s-id (+ %s-id 1))", prefix, prefix);
-    s7_eval_c_string(s7, buf);
+    snprintf(buf, sizeof(buf), "%s-id", prefix);
+    s7_pointer sym = s7_symbol_table_find_name(s7, buf);
+    if (sym) {
+        s7_pointer val = s7_symbol_value(s7, sym);
+        if (s7_is_integer(val)) {
+            printf("Before : %lld\n", s7_integer(val));
+            s7_symbol_set_value(s7, sym, s7_make_integer(s7, s7_integer(val) + 1));
+            printf("After  : %lld\n", s7_integer(val));
+
+        }
+    }
     return node;
 }

@@ -2,7 +2,7 @@
 (define crt-width 324) 
 (define crt-height 224)
 
-(define crt-descriptor
+(define (crt-descriptor)
     (let*  ((static-id   (control-counter 0))
             (control-id  (control-counter 0))
             (input-id    (control-counter 0))

@@ -2,7 +2,7 @@
 (define vco-width 249) 
 (define vco-height 199)
 
-(define vco-descriptor
+(define (vco-descriptor)
     (let*  ((static-id   (control-counter 0))
             (control-id  (control-counter 0))
             (input-id    (control-counter 0))
