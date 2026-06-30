@@ -19,15 +19,18 @@ void core_bind_module(Node* node, core_node* module) {
     for(uint32_t i = 0; i < module->descriptor->ic; ++i) {
         auto uid = core_encode_uid(module->type, node->uid, F_CT_INPUT, i);
         auto entity = ff_find_entity_by_id(node->parent, uid);
-        if(entity)
-            module->icv[i] = entity->input;
+        if(entity) {
+            auto ext = (Socket*)entity->extension;
+            module->icv[i] = ext->input;
+        }
     }
 
     for(uint32_t i = 0; i < module->descriptor->oc; ++i) {
         auto uid = core_encode_uid(module->type, node->uid, F_CT_OUTPUT, i);
         auto entity = ff_find_entity_by_id(node->parent, uid);
         if(entity) {
-            entity->output = &module->ocv[i];
+            auto ext = (Socket*)entity->extension;
+            ext->output = &module->ocv[i];
         }
     }
 }

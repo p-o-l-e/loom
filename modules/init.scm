@@ -60,6 +60,8 @@
                     (Flags:         . 0)
                     (Output:        . 0)
                     (CoreType:      . 0)
+                    (InputX:        . 0)
+                    (InputY:        . 0)
                 )
             )
          )

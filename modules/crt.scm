@@ -9,6 +9,8 @@
             (output-id   (control-counter 0))
             (display-w 250)
             (display-h 200)
+            (input-x-id  (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id)))
+            (input-y-id  (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id)))
             )
 
     (list
@@ -22,20 +24,9 @@
             Flags:          MOVEABLE
         )
 
-        (sector
-            ID:             (encode-uid CMT_CRT crt-id F_CT_STATIC (static-id))
-            NodeID:         crt-id
-            Left:           (grid-x 2)
-            Top:            (quotient (- crt-height display-h) 2)
-            Width:          display-w
-            Height:         display-h
-            Type:           ST_CRT
-            Flags:          TRANSPARENT
-        )
-
         ;---INPUTS--------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id))
+            ID:             input-x-id
             NodeID:         crt-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
@@ -59,7 +50,7 @@
         )
 
         (sector
-            ID:             (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id))
+            ID:             input-y-id
             NodeID:         crt-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
@@ -80,6 +71,20 @@
             Type:           ST_TEXTBOX
             Label:          "Y"
             Flags:          TRANSPARENT
+        )
+
+        ;---CRT-----------------------------------------------------------------------------------------------------------------
+        (sector
+            ID:             (encode-uid CMT_CRT crt-id F_CT_STATIC (static-id))
+            NodeID:         crt-id
+            Left:           (grid-x 2)
+            Top:            (quotient (- crt-height display-h) 2)
+            Width:          display-w
+            Height:         display-h
+            Type:           ST_CRT
+            Flags:          TRANSPARENT
+            InputX:         input-x-id
+            InputY:         input-y-id
         )
     ))
 )

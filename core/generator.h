@@ -10,8 +10,9 @@ static const core_descriptor core_generator_descriptor = { .cc = 3, .ic = 0, .oc
 
 struct core_generator {
     enum {
-        CG_C_DELTA  = 0,
-        CG_C_AMP    = 1,
+        CG_C_COARSE = 0,
+        CG_C_FINE,   
+        CG_C_AMP  
     } C;
     enum {
         CG_O_A      = 0,
@@ -22,7 +23,7 @@ struct core_generator {
 
 void core_generator_process(core_node* node) {
     core_generator* generator = (core_generator*)node->data;
-    generator->phase += *node->ccv[CG_C_DELTA];
+    generator->phase += (*node->ccv[CG_C_COARSE] + *node->ccv[CG_C_FINE]) * 0.001f;
     if(generator->phase > pi) generator->phase -= tao;
-    node->ocv[CG_O_A] = cosf(generator->phase);// * *node->ccv[CG_C_AMP];
+    node->ocv[CG_O_A] = cosf(generator->phase) * *node->ccv[CG_C_AMP];
 }
