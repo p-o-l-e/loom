@@ -3,9 +3,10 @@
 (define crt-height 224)
 
 (define crt-descriptor
-    (let*  ((socket-id   (control-counter 0))
-            (textbox-id  (control-counter 0))
-            (display-id  (control-counter 0))
+    (let*  ((static-id   (control-counter 0))
+            (control-id  (control-counter 0))
+            (input-id    (control-counter 0))
+            (output-id   (control-counter 0))
             (display-w 250)
             (display-h 200)
             )
@@ -22,7 +23,7 @@
         )
 
         (sector
-            ID:             (encode-uid MT_CRT crt-id ST_CRT (display-id))
+            ID:             (encode-uid CMT_CRT crt-id F_CT_STATIC (static-id))
             NodeID:         crt-id
             Left:           (grid-x 2)
             Top:            (quotient (- crt-height display-h) 2)
@@ -34,18 +35,19 @@
 
         ;---INPUTS--------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_CRT crt-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id))
             NodeID:         crt-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            CoreType:       F_CT_INPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_CRT crt-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_CRT crt-id F_CT_STATIC (static-id))
             NodeID:         crt-id
             Left:           (grid-x 1)
             Top:            (grid-y 4)
@@ -57,18 +59,19 @@
         )
 
         (sector
-            ID:             (encode-uid MT_CRT crt-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_CRT crt-id F_CT_INPUT (input-id))
             NodeID:         crt-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            CoreType:       F_CT_INPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_CRT crt-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_CRT crt-id F_CT_STATIC (static-id))
             NodeID:         crt-id
             Left:           (grid-x 1)
             Top:            (grid-y 5)

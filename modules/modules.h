@@ -1,4 +1,5 @@
 #pragma once
+#include "../core/common.h"
 #include "../s7/s7.h"
 #include "../field/field.h"
 
@@ -22,22 +23,12 @@ const char crt_scm[] = {
     #embed "crt.scm"
 };
 
-typedef enum {
-    MT_FUSE,
-    MT_GENERATOR,
-    MT_VCO,
-    MT_CRT,
-
-    MT_LIMIT
-
-} ModuleType;
-
 void bindModuleDefinitions(s7_scheme *s7) {
-    s7_define_variable(s7, "MT_FUSE", s7_make_integer(s7, MT_FUSE));
-    s7_define_variable(s7, "MT_GENERATOR", s7_make_integer(s7, MT_GENERATOR));
-    s7_define_variable(s7, "MT_VCO", s7_make_integer(s7, MT_VCO));
-    s7_define_variable(s7, "MT_CRT", s7_make_integer(s7, MT_CRT));
-    s7_define_variable(s7, "MT_LIMIT", s7_make_integer(s7, MT_LIMIT));
+    s7_define_variable(s7, "CMT_FUSE", s7_make_integer(s7, CMT_FUSE));
+    s7_define_variable(s7, "CMT_GENERATOR", s7_make_integer(s7, CMT_GENERATOR));
+    s7_define_variable(s7, "CMT_VCO", s7_make_integer(s7, CMT_VCO));
+    s7_define_variable(s7, "CMT_CRT", s7_make_integer(s7, CMT_CRT));
+    s7_define_variable(s7, "CMT_LIMIT", s7_make_integer(s7, CMT_LIMIT));
 }
 
 static int load_dimension(s7_scheme* s7, const char* prefix, const char* suffix, int* out) {

@@ -3,17 +3,16 @@
 (define vco-height 199)
 
 (define vco-descriptor
-    (let*  ((textbox-id  (control-counter 0))
-            (checkbox-id (control-counter 0))
-            (socket-id   (control-counter 0))
-            (encoder-id  (control-counter 0))
-            (slider-id   (control-counter 0))
-            (TBoxCoarse  (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
-            (TBoxFine    (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
-            (TBoxPWM     (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
-            (TBoxFM      (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
-            (TBoxAM      (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
-            (TBoxAmp     (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id)))
+    (let*  ((static-id   (control-counter 0))
+            (control-id  (control-counter 0))
+            (input-id    (control-counter 0))
+            (output-id   (control-counter 0))
+            (TBoxCoarse  (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
+            (TBoxFine    (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
+            (TBoxPWM     (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
+            (TBoxFM      (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
+            (TBoxAM      (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
+            (TBoxAmp     (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id)))
             )
 
     (list
@@ -28,7 +27,7 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 0)
@@ -42,7 +41,7 @@
         ;---COARSE--------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 1)
@@ -66,13 +65,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 1)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       1.0
@@ -87,7 +87,7 @@
         ;---FINE----------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 2)
@@ -111,13 +111,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 2)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       0.01
@@ -132,7 +133,7 @@
         ;---PWM-----------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 3)
@@ -156,13 +157,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_ENCODER (encoder-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 3)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_ENCODER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_A
             DefaultValue:   0.00
             RangeMin:       -1.00
@@ -177,7 +179,7 @@
         ;---FM------------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
@@ -201,13 +203,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 4)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   0.00
             RangeMin:       0.00
@@ -222,7 +225,7 @@
         ;---AM------------------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
@@ -246,13 +249,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 5)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   0.00
             RangeMin:       0.00
@@ -267,7 +271,7 @@
         ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 6)
@@ -291,13 +295,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 6)
             Width:          (* 6 GridStepX)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   0.00
             RangeMin:       0.00
@@ -311,51 +316,54 @@
 
         ;---SWITCHES------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 7)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
-            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
+            CoreType:       F_CT_CONTROL
+            RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 8)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
-            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
+            RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_CHECKBOX (checkbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_CONTROL (control-id))
             NodeID:         vco-id
             Left:           (grid-x 3)
             Top:            (grid-y 9)
             Width:          Unit
             Height:         Unit
             Type:           ST_CHECKBOX
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
-            RadioID:        (encode-uid MT_VCO vco-id ST_CHECKBOX 0)
+            RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
             Output:         0
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 7)
@@ -367,7 +375,7 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 8)
@@ -379,7 +387,7 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 4)
             Top:            (grid-y 9)
@@ -392,52 +400,56 @@
 
         ;---INPUTS--------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_INPUT (input-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 3)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            CoreType:       F_CT_INPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_INPUT (input-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 4)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            CoreType:       F_CT_INPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_INPUT (input-id))
             NodeID:         vco-id
             Left:           (grid-x 0)
             Top:            (grid-y 5)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON INPUT MOVEABLE)
+            CoreType:       F_CT_INPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         ;---OUTPUTS-------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_OUTPUT (output-id))
             NodeID:         vco-id
             Left:           (grid-x 12)
             Top:            (grid-y 8)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON OUTPUT MOVEABLE)
+            CoreType:       F_CT_OUTPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 11)
             Top:            (grid-y 8)
@@ -449,18 +461,19 @@
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_OUTPUT (output-id))
             NodeID:         vco-id
             Left:           (grid-x 12)
             Top:            (grid-y 9)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON OUTPUT MOVEABLE)
+            CoreType:       F_CT_OUTPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_VCO vco-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_VCO vco-id F_CT_STATIC (static-id))
             NodeID:         vco-id
             Left:           (grid-x 11)
             Top:            (grid-y 9)

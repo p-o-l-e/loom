@@ -35,6 +35,7 @@ static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
 
     desc->flags             = s7_integer              (s7_list_ref(s7, args, 15));
     desc->output            = s7_integer              (s7_list_ref(s7, args, 16));
+    desc->core_type         = s7_integer              (s7_list_ref(s7, args, 17));
 
     return s7_make_c_pointer(s7, desc);
 }
@@ -64,12 +65,15 @@ void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "VERTICAL",              s7_make_integer(s7, VERTICAL));
     s7_define_variable(s7, "MOVEABLE",              s7_make_integer(s7, MOVEABLE));
     s7_define_variable(s7, "INTERCON",              s7_make_integer(s7, INTERCON));
-    s7_define_variable(s7, "INPUT",                 s7_make_integer(s7, INPUT));
-    s7_define_variable(s7, "OUTPUT",                s7_make_integer(s7, OUTPUT));
     s7_define_variable(s7, "TRANSPARENT",           s7_make_integer(s7, TRANSPARENT));
     s7_define_variable(s7, "RADIO",                 s7_make_integer(s7, RADIO));
 
-    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 17, 0, false,
+    s7_define_variable(s7, "F_CT_STATIC",           s7_make_integer(s7, F_CT_STATIC));
+    s7_define_variable(s7, "F_CT_INPUT",            s7_make_integer(s7, F_CT_INPUT));
+    s7_define_variable(s7, "F_CT_OUTPUT",           s7_make_integer(s7, F_CT_OUTPUT));
+    s7_define_variable(s7, "F_CT_CONTROL",          s7_make_integer(s7, F_CT_CONTROL));
+
+    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 18, 0, false,
         "(create-sector-descriptor id node_id l t w h width height type subtype default min max step_coarse step_fine radio_id flags)");
 }
 

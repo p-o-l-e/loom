@@ -3,14 +3,13 @@
 (define generator-height 99)
 
 (define generator-descriptor
-    (let*  ((textbox-id  (control-counter 0))
-            (checkbox-id (control-counter 0))
-            (socket-id   (control-counter 0))
-            (encoder-id  (control-counter 0))
-            (slider-id   (control-counter 0))
-            (TBoxCoarse  (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id)))
-            (TBoxFine    (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id)))
-            (TBoxAmp     (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id)))
+    (let*  ((static-id   (control-counter 0))
+            (control-id  (control-counter 0))
+            (input-id    (control-counter 0))
+            (output-id   (control-counter 0))
+            (TBoxCoarse  (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id)))
+            (TBoxFine    (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id)))
+            (TBoxAmp     (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id)))
             )
 
     (list
@@ -25,7 +24,7 @@
         )
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id))
             NodeID:         generator-id
             Left:           (grid-x 3)
             Top:            (grid-y 0)
@@ -39,7 +38,7 @@
         ;---COARSE--------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id))
             NodeID:         generator-id
             Left:           (grid-x 0)
             Top:            (grid-y 1)
@@ -63,13 +62,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_CONTROL (control-id))
             NodeID:         generator-id
             Left:           (grid-x 3)
             Top:            (grid-y 1)
             Width:          (* 10 Unit)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       1.0
@@ -84,7 +84,7 @@
         ;---FINE----------------------------------------------------------------------------------------------------------------
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id))
             NodeID:         generator-id
             Left:           (grid-x 0)
             Top:            (grid-y 2)
@@ -108,13 +108,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_CONTROL (control-id))
             NodeID:         generator-id
             Left:           (grid-x 3)
             Top:            (grid-y 2)
             Width:          (* 10 Unit)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   1.0
             RangeMin:       0.01
@@ -129,7 +130,7 @@
         ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
         
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id))
             NodeID:         generator-id
             Left:           (grid-x 0)
             Top:            (grid-y 3)
@@ -153,13 +154,14 @@
         )
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_SLIDER (slider-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_CONTROL (control-id))
             NodeID:         generator-id
             Left:           (grid-x 3)
             Top:            (grid-y 3)
             Width:          (* 10 Unit)
             Height:         Unit
             Type:           ST_SLIDER
+            CoreType:       F_CT_CONTROL
             SubType:        SS_B
             DefaultValue:   0.00
             RangeMin:       0.00
@@ -173,18 +175,19 @@
 
         ;---OUTPUTS-------------------------------------------------------------------------------------------------------------
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_SOCKET (socket-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_OUTPUT (output-id))
             NodeID:         generator-id
             Left:           (grid-x 12)
             Top:            (grid-y 4)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
-            Flags:          (logior INTERCON OUTPUT MOVEABLE)
+            CoreType:       F_CT_OUTPUT
+            Flags:          (logior INTERCON MOVEABLE)
         )
 
         (sector
-            ID:             (encode-uid MT_GENERATOR generator-id ST_TEXTBOX (textbox-id))
+            ID:             (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id))
             NodeID:         generator-id
             Left:           (grid-x 10)
             Top:            (grid-y 4)

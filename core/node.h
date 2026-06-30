@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include "common.h"
 #include "uid.h"
 
 static float const fuse = 0.0f;
@@ -11,12 +12,6 @@ constexpr float tao = 6.28318530717958647692f;
 typedef struct core_descriptor core_descriptor;
 typedef struct core_node core_node;
 typedef struct core_rack core_rack;
-
-typedef enum {
-    CMT_FUSE,
-    CMT_GENERATOR,
-    CMT_CRT,
-} core_module_type;
 
 struct core_descriptor {
     uint32_t cc;

@@ -59,6 +59,7 @@
                     (Label:         . "")
                     (Flags:         . 0)
                     (Output:        . 0)
+                    (CoreType:      . 0)
                 )
             )
          )
