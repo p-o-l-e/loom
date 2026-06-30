@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "modules.h"
 #include "node.h"
 
 typedef struct {
@@ -63,4 +64,68 @@ static inline void core_stop(core_thread* pt) {
     pthread_join(pt->thread, NULL);
     pthread_mutex_destroy(&pt->lock);
     free(pt);
+}
+
+
+/** Node *********************************************************************************************************************/
+
+static void core_init_node(core_node* node, core_module_type type, uint32_t id) {
+    switch (type) {
+        case CMT_GENERATOR:
+            node->descriptor = &core_generator_descriptor;
+            node->process = &core_generator_process;
+            node->data = malloc(sizeof(core_generator));
+            break;
+        case CMT_CRT:
+            node->descriptor = &core_crt_descriptor;
+            node->process = &core_crt_process;
+            node->data = malloc(sizeof(core_crt));
+            break;
+        case CMT_VCO:
+        case CMT_FUSE:
+        case CMT_LIMIT:
+        default:
+            node->descriptor = &core_fuse_descriptor;
+            node->process = &core_fuse_process;
+            node->data = nullptr;
+            break;
+    }
+
+    node->type = type;
+    node->bypass = false;
+
+    node->ccv = malloc(node->descriptor->cc * sizeof(float*));
+    node->icv = malloc(node->descriptor->ic * sizeof(float*));
+    node->ocv = malloc(node->descriptor->oc * sizeof(float));
+
+    for(uint32_t i = 0; i < node->descriptor->cc; ++i) node->ccv[i] = &fuse;
+    for(uint32_t i = 0; i < node->descriptor->ic; ++i) node->icv[i] = &fuse;
+
+    node->uid = id;
+}
+
+static inline void core_destroy_node(core_node* node) {
+    free(node->ocv);
+    free((void*)node->icv);
+    free((void*)node->ccv);
+    if(node->data) free(node->data);
+}
+
+static inline core_rack* core_create_rack(uint32_t capacity) {
+    core_rack* rack = malloc(sizeof(core_rack));
+    if (!rack) return NULL;
+
+    rack->node = calloc(capacity, sizeof(core_node));
+    rack->nodes = 0;
+    rack->capacity = capacity;
+    return rack;
+}
+
+static inline void core_destroy_rack(core_rack* rack) {
+    if (!rack) return;
+    for (uint32_t i = 0; i < rack->nodes; ++i) {
+        core_destroy_node(&rack->node[i]);
+    }
+    free(rack->node);
+    free(rack);
 }

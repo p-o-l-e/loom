@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include "bridge.h"
+#include "core/node.h"
 #define QOI_IMPLEMENTATION
 #include "qoi.h"
 
@@ -61,6 +62,9 @@ int main(int argc, char** argv)
 
     core_rack* rack = core_create_rack(RACK_CAPACITY);
 
+    core_init_node(&rack->node[0], CMT_GENERATOR, 0xf);
+    rack->nodes++;
+
     auto vco = load_module(s7, context, "vco");
     auto gen = load_module(s7, context, "generator");
     auto crt = load_module(s7, context, "crt");
@@ -68,6 +72,7 @@ int main(int argc, char** argv)
     ffPlaceNode(context, gen, 500, 0);
     ffPlaceNode(context, crt, 500, 300);
 
+    core_bind_module(gen, &rack->node[0]);
     core_thread* pt = core_start(rack, FPS);
 
     field_loop(context);

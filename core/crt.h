@@ -5,7 +5,7 @@
 
 typedef struct core_crt core_crt;
 
-static const core_descriptor core_generator_descriptor = { .cc = 0, .ic = 2, .oc = 2 };
+static const core_descriptor core_crt_descriptor = { .cc = 0, .ic = 2, .oc = 2 };
 
 struct core_crt {
     enum {
