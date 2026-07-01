@@ -82,7 +82,7 @@
             Width:          display-w
             Height:         display-h
             Type:           ST_CRT
-            Flags:          TRANSPARENT
+            Flags:          0;TRANSPARENT
             InputX:         input-x-id
             InputY:         input-y-id
         )

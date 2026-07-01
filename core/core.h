@@ -7,6 +7,7 @@
 #include <time.h>
 #include "modules.h"
 #include "node.h"
+#include "../field/field.h"
 
 typedef struct {
     pthread_t thread;
@@ -32,6 +33,7 @@ static void* core_loop(void* arg) {
             }
         }
 
+        atomic_store_explicit(&trigger_stream_update, true, memory_order_release); 
         pthread_mutex_unlock(&pt->lock);
         nanosleep(&ts, NULL);
     }

@@ -38,8 +38,8 @@ int main(int argc, char** argv)
 
     its.it_value.tv_sec     = 1;
     its.it_value.tv_nsec    = 0;
-    its.it_interval.tv_sec  = 1;
-    its.it_interval.tv_nsec = 0;
+    its.it_interval.tv_sec  = 0;
+    its.it_interval.tv_nsec = 2;
 
     if (timer_settime(timer_id, 0, &its, NULL) == -1) {
         perror("timer_settime");
