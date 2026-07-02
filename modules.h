@@ -1,32 +1,32 @@
 #pragma once
-#include "../core/common.h"
-#include "../s7/s7.h"
-#include "../field/field.h"
+#include "core/common.h"
+#include "s7/s7.h"
+#include "field/field.h"
 #include <stdio.h>
 
-const char layout_scm[] = {
-    #embed "layout.scm"
+const char layout_scm[]     = { 
+    #embed "modules/layout.scm" 
 };
-
-const char init_scm[] = {
-    #embed "init.scm"
+const char init_scm[]       = { 
+    #embed "modules/init.scm" 
 };
-
-const char vco_scm[] = {
-    #embed "vco.scm"
+const char vco_scm[]        = { 
+    #embed "modules/vco.scm" 
 };
-
-const char generator_scm[] = {
-    #embed "generator.scm"
+const char generator_scm[]  = { 
+    #embed "modules/generator.scm" 
 };
-
-const char crt_scm[] = {
-    #embed "crt.scm"
+const char crt_scm[]        = { 
+    #embed "modules/crt.scm" 
+};
+const char mainmenu_scm[]        = { 
+    #embed "ui/menu.scm" 
 };
 
 void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "CMT_FUSE", s7_make_integer(s7, CMT_FUSE));
     s7_define_variable(s7, "CMT_GENERATOR", s7_make_integer(s7, CMT_GENERATOR));
+    s7_define_variable(s7, "CMT_MAINMENU", s7_make_integer(s7, CMT_MAINMENU));
     s7_define_variable(s7, "CMT_VCO", s7_make_integer(s7, CMT_VCO));
     s7_define_variable(s7, "CMT_CRT", s7_make_integer(s7, CMT_CRT));
     s7_define_variable(s7, "CMT_LIMIT", s7_make_integer(s7, CMT_LIMIT));

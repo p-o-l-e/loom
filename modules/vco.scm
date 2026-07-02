@@ -81,7 +81,8 @@
             StepFine:       0.1
             Label:          "COARSE"
             Flags:          MOVEABLE
-            Output:         TBoxCoarse
+            CallbackTarget: TBoxCoarse
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---FINE----------------------------------------------------------------------------------------------------------------
@@ -127,7 +128,8 @@
             StepFine:       0.01
             Label:          "FINE"
             Flags:          MOVEABLE
-            Output:         TBoxFine
+            CallbackTarget: TBoxFine
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---PWM-----------------------------------------------------------------------------------------------------------------
@@ -173,7 +175,8 @@
             StepFine:       0.01
             Label:          "PWM"
             Flags:          MOVEABLE
-            Output:         TBoxPWM
+            CallbackTarget: TBoxPWM
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---FM------------------------------------------------------------------------------------------------------------------
@@ -219,7 +222,8 @@
             StepFine:       0.001
             Label:          "FM"
             Flags:          MOVEABLE
-            Output:         TBoxFM
+            CallbackTarget: TBoxFM
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---AM------------------------------------------------------------------------------------------------------------------
@@ -265,7 +269,8 @@
             StepFine:       0.001
             Label:          "AM"
             Flags:          MOVEABLE
-            Output:         TBoxAM
+            CallbackTarget: TBoxAM
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
@@ -311,7 +316,7 @@
             StepFine:       0.001
             Label:          "AMP"
             Flags:          MOVEABLE
-            Output:         TBoxAmp
+            CallbackTarget: TBoxAmp
         )
 
         ;---SWITCHES------------------------------------------------------------------------------------------------------------
@@ -327,7 +332,7 @@
             RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
-            Output:         0
+            CallbackTarget: 0
         )
 
         (sector
@@ -343,7 +348,7 @@
             RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
-            Output:         0
+            CallbackTarget: 0
         )
 
         (sector
@@ -359,7 +364,7 @@
             RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
-            Output:         0
+            CallbackTarget: 0
         )
 
         (sector

@@ -2,7 +2,7 @@
 #include "core/uid.h"
 #include "field/field.h"
 #include "field/field_glfw.h"
-#include "modules/modules.h"
+#include "modules.h"
 #include "scheme.h"
 #include "core/core.h"
 #include <stdint.h>

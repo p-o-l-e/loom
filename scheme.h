@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "field/field.h"
-#include "modules/modules.h"
+#include "modules.h"
 #include "s7/s7.h"
 
 
@@ -33,11 +33,12 @@ static s7_pointer s7_sector_descriptor(s7_scheme *s7, s7_pointer args) {
         desc->label         = NULL;
     }
 
-    desc->flags             = s7_integer              (s7_list_ref(s7, args, 15));
-    desc->output            = s7_integer              (s7_list_ref(s7, args, 16));
-    desc->core_type         = s7_integer              (s7_list_ref(s7, args, 17));
-    desc->input_x           = s7_integer              (s7_list_ref(s7, args, 18));
-    desc->input_y           = s7_integer              (s7_list_ref(s7, args, 19));
+    desc->flags                 = s7_integer        (s7_list_ref(s7, args, 15));
+    desc->callback_target_id    = s7_integer        (s7_list_ref(s7, args, 16));
+    desc->core_type             = s7_integer        (s7_list_ref(s7, args, 17));
+    desc->input_x               = s7_integer        (s7_list_ref(s7, args, 18));
+    desc->input_y               = s7_integer        (s7_list_ref(s7, args, 19));
+    desc->callback_event        = s7_integer        (s7_list_ref(s7, args, 20));
 
     return s7_make_c_pointer(s7, desc);
 }
@@ -75,7 +76,12 @@ void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "F_CT_OUTPUT",           s7_make_integer(s7, F_CT_OUTPUT));
     s7_define_variable(s7, "F_CT_CONTROL",          s7_make_integer(s7, F_CT_CONTROL));
 
-    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 20, 0, false,
+    s7_define_variable(s7, "F_CE_PRESS",            s7_make_integer(s7, F_CE_PRESS));
+    s7_define_variable(s7, "F_CE_RELEASE",          s7_make_integer(s7, F_CE_RELEASE));
+    s7_define_variable(s7, "F_CE_VALUE",            s7_make_integer(s7, F_CE_VALUE));
+    s7_define_variable(s7, "F_CE_REPAINT",          s7_make_integer(s7, F_CE_REPAINT));
+
+    s7_define_function(s7, "create-sector-descriptor", s7_sector_descriptor, 21, 0, false,
         "(create-sector-descriptor id node_id l t w h width height type subtype default min max step_coarse step_fine radio_id flags)");
 }
 

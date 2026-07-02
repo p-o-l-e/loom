@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 6, ROOT);
+    Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 7, ROOT);
 
     printf("[MAIN] initField\n");
 
@@ -59,19 +59,22 @@ int main(int argc, char** argv)
     s7_load_embedded(s7, vco_scm, "vco_scm");
     s7_load_embedded(s7, generator_scm, "generator_scm");
     s7_load_embedded(s7, crt_scm, "crt_scm");
+    s7_load_embedded(s7, mainmenu_scm, "mainmenu_scm");
 
     core_rack* rack = core_create_rack(RACK_CAPACITY);
 
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xa);
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xb);
 
+    auto menu = load_module(s7, context, "menu");
     auto vco = load_module(s7, context, "vco");
     auto gen_a = load_module(s7, context, "generator");
     auto gen_b = load_module(s7, context, "generator");
     auto gen_c = load_module(s7, context, "generator");
     auto crt = load_module(s7, context, "crt");
-    ffPlaceNode(context, vco, 200, 0);
-    ffPlaceNode(context, gen_a, 500, 0);
+    ffPlaceNode(context, menu, 0, 0);
+    ffPlaceNode(context, vco, 200, 50);
+    ffPlaceNode(context, gen_a, 500, 50);
     ffPlaceNode(context, gen_b, 500, 175);
     ffPlaceNode(context, gen_c, 750, 175);
     ffPlaceNode(context, crt, 500, 300);

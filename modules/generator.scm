@@ -80,7 +80,8 @@
             StepFine:       0.1
             Label:          "COARSE"
             Flags:          MOVEABLE
-            Output:         TBoxCoarse
+            CallbackTarget: TBoxCoarse
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---FINE----------------------------------------------------------------------------------------------------------------
@@ -126,7 +127,8 @@
             StepFine:       0.01
             Label:          "FINE"
             Flags:          MOVEABLE
-            Output:         TBoxFine
+            CallbackTarget: TBoxFine
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---AMPLITUDE-----------------------------------------------------------------------------------------------------------
@@ -172,7 +174,8 @@
             StepFine:       0.001
             Label:          "AMP"
             Flags:          MOVEABLE
-            Output:         TBoxAmp
+            CallbackTarget: TBoxAmp
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---OUTPUTS-------------------------------------------------------------------------------------------------------------
@@ -193,7 +196,7 @@
             NodeID:         generator-id
             Left:           (grid-x 10)
             Top:            (grid-y 4)
-            Width:          (* 3 Unit)
+            Width:          (* 2 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
             Label:          "OUT"
