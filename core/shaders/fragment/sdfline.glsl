@@ -1,5 +1,6 @@
 #version 330 core
-uniform vec2 samples[bsize];
+#define BSIZE 128
+uniform vec2 samples[BSIZE];
 uniform float thickness;
 uniform vec4 lineColor;
 
@@ -14,7 +15,7 @@ out vec4 FragColor;
 void main() {
     vec2 uv = gl_FragCoord.xy;
     float dmin = 1e6;
-    for(int i = 0; i < bsize-1; i++) {
+    for(int i = 0; i < BSIZE-1; i++) {
         dmin = min(dmin, sdSegment(uv, samples[i], samples[i+1]));
     }
     if(dmin < thickness) {
