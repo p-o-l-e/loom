@@ -19,6 +19,9 @@ param(
     [ValidateSet('clang', 'clang-cl')]
     [string]$Compiler = 'clang',
 
+    [ValidateSet('vulkan', 'opengl')]
+    [string]$Renderer = 'vulkan',
+
     # Relative paths are resolved against the repository, not the caller's directory.
     [string]$BuildDirectory = '',
 
@@ -90,7 +93,8 @@ try {
         "-DCMAKE_C_COMPILER=$clang" `
         '-DCMAKE_C_COMPILER_TARGET=x86_64-pc-windows-msvc' `
         "-DCMAKE_MAKE_PROGRAM=$ninja" `
-        "-DCMAKE_BUILD_TYPE=$Configuration"
+        "-DCMAKE_BUILD_TYPE=$Configuration" `
+        "-DLOOM_RENDERER=$Renderer"
     if ($LASTEXITCODE -ne 0) { throw "CMake configuration failed (exit $LASTEXITCODE)." }
 
     & $cmake --build $BuildDirectory --config $Configuration --parallel $Jobs

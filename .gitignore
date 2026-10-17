@@ -1,5 +1,7 @@
 build
 build-release
+build-vulkan
+build-opengl
 cmake-build-debug
 .cache
 .idea
