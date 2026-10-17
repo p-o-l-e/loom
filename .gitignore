@@ -1,5 +1,7 @@
 build
+build-release
 cmake-build-debug
 .cache
 .idea
 AGENTS.md
+shaders/*.spv

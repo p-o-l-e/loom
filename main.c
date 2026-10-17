@@ -79,6 +79,11 @@ int main(int argc, char** argv)
     ffPlaceNode(context, gen_c, 750, 175);
     ffPlaceNode(context, crt, 500, 300);
 
+    if (context->stream[0]) {
+        auto osc = (Oscillograph*)context->stream[0]->extension;
+        osc->fps = FPS;
+    }
+
     core_bind_module(gen_a, &rack->node[0]);
     core_bind_module(gen_b, &rack->node[1]);
     core_thread* pt = core_start(rack, FPS);
