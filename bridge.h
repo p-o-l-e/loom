@@ -21,6 +21,10 @@ void core_bind_module(Node* node, core_node* module) {
         auto entity = ff_find_entity_by_id(node->parent, uid);
         if(entity) {
             auto ext = (Socket*)entity->extension;
+            /* The socket's input pointer is a snapshot (null until a cable is
+               drawn); the link lets ff_connect/ff_disconnect keep the module's
+               icv slot tracking the live connection. */
+            ext->input_link = &module->icv[i];
             module->icv[i] = ext->input;
         }
     }

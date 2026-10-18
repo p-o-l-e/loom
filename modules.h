@@ -64,7 +64,7 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     s7_pointer list_obj;
     if (load_descriptor(s7, prefix, &list_obj) < 0) return nullptr;
 
-    int entities = s7_list_length(s7, list_obj);
+    s7_int entities = s7_list_length(s7, list_obj);
     char buf[256];
     //printf("---- Entities : %lld\n", entities);
 
@@ -72,11 +72,11 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     int module_id;
     if (load_dimension(s7, prefix, "id", &module_id) == 0)
         node->uid = module_id;
-    int len = s7_list_length(s7, list_obj);
-    for (int i = 0; i < len; i++) {
+    s7_int len = s7_list_length(s7, list_obj);
+    for (s7_int i = 0; i < len; i++) {
         s7_pointer item = s7_list_ref(s7, list_obj, i);
         if (!s7_is_c_pointer(item)) {
-            fprintf(stderr, "[load_module] '%s' item %d is not a C pointer\n", prefix, i);
+            fprintf(stderr, "[load_module] '%s' item %lld is not a C pointer\n", prefix, (long long)i);
             continue;
         }
         SectorDescriptor* sd = (SectorDescriptor*)s7_c_pointer(item);
@@ -91,9 +91,9 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     if (sym) {
         s7_pointer val = s7_symbol_value(s7, sym);
         if (s7_is_integer(val)) {
-            printf("Before : %lld\n", s7_integer(val));
+            printf("Before : %lld\n", (long long)s7_integer(val));
             s7_symbol_set_value(s7, sym, s7_make_integer(s7, s7_integer(val) + 1));
-            printf("After  : %lld\n", s7_integer(val));
+            printf("After  : %lld\n", (long long)s7_integer(val));
 
         }
     }

@@ -15,7 +15,7 @@ struct core_node {
     float const** ccv;
     float const** icv;
     float* ocv;
-    void (*process)(core_node* this);
+    void (*process)(const core_node* this);
     core_descriptor const* descriptor;
     void* data;
     bool bypass;
@@ -29,4 +29,10 @@ struct core_rack {
     uint32_t capacity;
 };
 
-static void core_fuse_process(core_node*) {}
+static void core_fuse_process(const core_node*) {}
+
+/** Read a module input value. Unconnected (or disconnected) inputs read as 0. */
+static inline float core_node_input(const core_node* node, uint32_t index) {
+    auto p = node->icv[index];
+    return p ? *p : 0.0f;
+}

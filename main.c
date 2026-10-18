@@ -54,17 +54,18 @@ int main(int argc, char** argv)
     s7_scheme* s7 = s7_init();
     bindGuiConstants(s7);
     bindModuleDefinitions(s7);
-    s7_load_embedded(s7, init_scm, "init_scm");
-    s7_load_embedded(s7, layout_scm, "layout_scm");
-    s7_load_embedded(s7, vco_scm, "vco_scm");
-    s7_load_embedded(s7, generator_scm, "generator_scm");
-    s7_load_embedded(s7, crt_scm, "crt_scm");
-    s7_load_embedded(s7, mainmenu_scm, "mainmenu_scm");
+    s7_load_c_string(s7, init_scm, sizeof(init_scm));
+    s7_load_c_string(s7, layout_scm, sizeof(layout_scm));
+    s7_load_c_string(s7, vco_scm, sizeof(vco_scm));
+    s7_load_c_string(s7, generator_scm, sizeof(generator_scm));
+    s7_load_c_string(s7, crt_scm, sizeof(crt_scm));
+    s7_load_c_string(s7, mainmenu_scm, sizeof(mainmenu_scm));
 
     core_rack* rack = core_create_rack(RACK_CAPACITY);
 
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xa);
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xb);
+    core_init_node(&rack->node[rack->nodes++], CMT_VCO, 0xc);
 
     auto menu = load_module(s7, context, "menu");
     auto vco = load_module(s7, context, "vco");
@@ -86,6 +87,7 @@ int main(int argc, char** argv)
 
     core_bind_module(gen_a, &rack->node[0]);
     core_bind_module(gen_b, &rack->node[1]);
+    core_bind_module(vco, &rack->node[2]);
     core_thread* pt = core_start(rack, FPS);
 
     field_loop(context);

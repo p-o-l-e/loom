@@ -13,16 +13,16 @@ struct core_generator {
         CG_C_COARSE = 0,
         CG_C_FINE,   
         CG_C_AMP  
-    } C;
+    } CTL;
     enum {
         CG_O_A      = 0,
-    } O;
+    } OUT;
     float delta;
     float phase;
 };
 
-void core_generator_process(core_node* node) {
-    core_generator* generator = (core_generator*)node->data;
+void core_generator_process(const core_node* node) {
+    auto generator = (core_generator*)node->data;
     generator->phase += (*node->ccv[CG_C_COARSE] * *node->ccv[CG_C_FINE]) * 0.001f;
     if(generator->phase > pi) generator->phase -= tao;
     node->ocv[CG_O_A] = cosf(generator->phase) * *node->ccv[CG_C_AMP];

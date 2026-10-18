@@ -84,6 +84,10 @@ static void core_init_node(core_node* node, core_module_type type, uint32_t id) 
             node->data = malloc(sizeof(core_crt));
             break;
         case CMT_VCO:
+            node->descriptor = &core_vco_descriptor;
+            node->process = &core_vco_process;
+            node->data = calloc(1, sizeof(core_vco)); /* zeroed: phase starts defined */
+            break;
         case CMT_FUSE:
         case CMT_LIMIT:
         default:

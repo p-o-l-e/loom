@@ -317,6 +317,7 @@
             Label:          "AMP"
             Flags:          MOVEABLE
             CallbackTarget: TBoxAmp
+            CallbackEvent:  F_CE_VALUE
         )
 
         ;---SWITCHES------------------------------------------------------------------------------------------------------------
@@ -329,6 +330,7 @@
             Height:         Unit
             Type:           ST_CHECKBOX
             CoreType:       F_CT_CONTROL
+            DefaultValue:   1.0
             RadioID:        (encode-uid CMT_VCO vco-id F_CT_CONTROL 0)
             Label:          "SWITCH"
             Flags:          RADIO
