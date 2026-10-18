@@ -83,7 +83,7 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
         // printf("Descriptor %d: id=%u type=%d bounds=(%u,%u,%u,%u) output=%u\n",
         //     i, sd->id, sd->type,
         //     sd->bounds.l, sd->bounds.t, sd->bounds.w, sd->bounds.h, sd->output);
-        ffCreateEntity(node, sd);
+        (void)ffCreateEntity(node, sd);
     }
 
     snprintf(buf, sizeof(buf), "%s-id", prefix);
