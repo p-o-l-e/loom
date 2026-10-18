@@ -12,8 +12,8 @@
             (TBoxAmp     (encode-uid CMT_GENERATOR generator-id F_CT_STATIC (static-id)))
             )
 
-    (format #t "Module-ID : ~s ~%" generator-id) ;; In main.c we create 3 generators but this line printed once
-    (format #t "TBoxAmp   : ~X~%" TBoxAmp) ;; In main.c we create 3 generators but this line printed once
+    ;(format #t "Module-ID : ~s ~%" generator-id)
+    ;(format #t "TBoxAmp   : ~X~%" TBoxAmp)
     (list
         (sector
             ID:             generator-id

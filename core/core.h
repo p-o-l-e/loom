@@ -88,6 +88,11 @@ static void core_init_node(core_node* node, core_module_type type, uint32_t id) 
             node->process = &core_vco_process;
             node->data = calloc(1, sizeof(core_vco)); /* zeroed: phase starts defined */
             break;
+        case CMT_SPLIT:
+            node->descriptor = &core_split_descriptor;
+            node->process = &core_split_process;
+            node->data = nullptr; /* stateless: process reads inputs, writes outputs only */
+            break;
         case CMT_FUSE:
         case CMT_LIMIT:
         default:

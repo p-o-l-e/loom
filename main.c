@@ -54,18 +54,22 @@ int main(int argc, char** argv)
     s7_scheme* s7 = s7_init();
     bindGuiConstants(s7);
     bindModuleDefinitions(s7);
-    s7_load_c_string(s7, init_scm, sizeof(init_scm));
-    s7_load_c_string(s7, layout_scm, sizeof(layout_scm));
-    s7_load_c_string(s7, vco_scm, sizeof(vco_scm));
-    s7_load_c_string(s7, generator_scm, sizeof(generator_scm));
-    s7_load_c_string(s7, crt_scm, sizeof(crt_scm));
-    s7_load_c_string(s7, mainmenu_scm, sizeof(mainmenu_scm));
+    /* sizeof - 1: arrays are NUL-terminated (#embed does not add one), and
+       s7_load_c_string requires content[bytes] == 0. */
+    s7_load_c_string(s7, init_scm, sizeof(init_scm) - 1);
+    s7_load_c_string(s7, layout_scm, sizeof(layout_scm) - 1);
+    s7_load_c_string(s7, vco_scm, sizeof(vco_scm) - 1);
+    s7_load_c_string(s7, generator_scm, sizeof(generator_scm) - 1);
+    s7_load_c_string(s7, crt_scm, sizeof(crt_scm) - 1);
+    s7_load_c_string(s7, split_scm, sizeof(split_scm) - 1);
+    s7_load_c_string(s7, mainmenu_scm, sizeof(mainmenu_scm) - 1);
 
     core_rack* rack = core_create_rack(RACK_CAPACITY);
 
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xa);
     core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xb);
     core_init_node(&rack->node[rack->nodes++], CMT_VCO, 0xc);
+    core_init_node(&rack->node[rack->nodes++], CMT_SPLIT, 0xd);
 
     auto menu = load_module(s7, context, "menu");
     auto vco = load_module(s7, context, "vco");
@@ -73,12 +77,14 @@ int main(int argc, char** argv)
     auto gen_b = load_module(s7, context, "generator");
     auto gen_c = load_module(s7, context, "generator");
     auto crt = load_module(s7, context, "crt");
+    auto split = load_module(s7, context, "split");
     ffPlaceNode(context, menu, 0, 0);
     ffPlaceNode(context, vco, 200, 50);
     ffPlaceNode(context, gen_a, 500, 50);
     ffPlaceNode(context, gen_b, 500, 175);
     ffPlaceNode(context, gen_c, 750, 175);
     ffPlaceNode(context, crt, 500, 300);
+    ffPlaceNode(context, split, 50, 350);
 
     if (context->stream[0]) {
         auto osc = (Oscillograph*)context->stream[0]->extension;
@@ -88,6 +94,7 @@ int main(int argc, char** argv)
     core_bind_module(gen_a, &rack->node[0]);
     core_bind_module(gen_b, &rack->node[1]);
     core_bind_module(vco, &rack->node[2]);
+    core_bind_module(split, &rack->node[3]);
     core_thread* pt = core_start(rack, FPS);
 
     field_loop(context);

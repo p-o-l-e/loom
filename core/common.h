@@ -7,5 +7,6 @@ typedef enum {
     CMT_VCO,
     CMT_CRT,
     CMT_MAINMENU,
+    CMT_SPLIT,
     CMT_LIMIT
 } core_module_type;

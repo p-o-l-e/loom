@@ -5,22 +5,32 @@
 #include <stdio.h>
 
 const char layout_scm[]     = { 
-    #embed "modules/layout.scm" 
+    #embed "modules/layout.scm"
+    , 0
 };
 const char init_scm[]       = { 
-    #embed "modules/init.scm" 
+    #embed "modules/init.scm"
+    , 0
 };
 const char vco_scm[]        = { 
-    #embed "modules/vco.scm" 
+    #embed "modules/vco.scm"
+    , 0
 };
 const char generator_scm[]  = { 
-    #embed "modules/generator.scm" 
+    #embed "modules/generator.scm"
+    , 0
 };
 const char crt_scm[]        = { 
-    #embed "modules/crt.scm" 
+    #embed "modules/crt.scm"
+    , 0
+};
+const char split_scm[]      = { 
+    #embed "modules/split.scm"
+    , 0
 };
 const char mainmenu_scm[]        = { 
-    #embed "ui/menu.scm" 
+    #embed "ui/menu.scm"
+    , 0
 };
 
 void bindModuleDefinitions(s7_scheme *s7) {
@@ -29,6 +39,7 @@ void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "CMT_MAINMENU", s7_make_integer(s7, CMT_MAINMENU));
     s7_define_variable(s7, "CMT_VCO", s7_make_integer(s7, CMT_VCO));
     s7_define_variable(s7, "CMT_CRT", s7_make_integer(s7, CMT_CRT));
+    s7_define_variable(s7, "CMT_SPLIT", s7_make_integer(s7, CMT_SPLIT));
     s7_define_variable(s7, "CMT_LIMIT", s7_make_integer(s7, CMT_LIMIT));
 }
 
