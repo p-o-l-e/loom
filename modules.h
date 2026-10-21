@@ -83,6 +83,13 @@ static Node* load_module(s7_scheme* s7, Field* context, const char* prefix) {
     int module_id;
     if (load_dimension(s7, prefix, "id", &module_id) == 0)
         node->uid = module_id;
+    /* Optional node anchors: a module defines <prefix>-anchors (a ResizeFlags
+     * bitmask) to pin its edges to the window borders on resize. Modules
+     * without the define keep NONE (no anchor behaviour). */
+    snprintf(buf, sizeof(buf), "%s-anchors", prefix);
+    s7_pointer anchors = s7_name_to_value(s7, buf);
+    if (s7_is_integer(anchors))
+        node->anchors = (uint32_t)s7_integer(anchors);
     s7_int len = s7_list_length(s7, list_obj);
     for (s7_int i = 0; i < len; i++) {
         s7_pointer item = s7_list_ref(s7, list_obj, i);

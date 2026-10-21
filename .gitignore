@@ -3,6 +3,8 @@ build-release
 build-vulkan
 build-opengl
 cmake-build-debug
+cmake-build-asan
+cmake-build-asan-gl
 .cache
 .idea
 AGENTS.md

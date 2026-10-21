@@ -71,6 +71,13 @@ void bindGuiConstants(s7_scheme *s7) {
     s7_define_variable(s7, "TRANSPARENT",           s7_make_integer(s7, TRANSPARENT));
     s7_define_variable(s7, "RADIO",                 s7_make_integer(s7, RADIO));
 
+    s7_define_variable(s7, "ANCHOR_NONE",           s7_make_integer(s7, NONE));
+    s7_define_variable(s7, "ANCHOR_LEFT",           s7_make_integer(s7, LEFT));
+    s7_define_variable(s7, "ANCHOR_TOP",            s7_make_integer(s7, TOP));
+    s7_define_variable(s7, "ANCHOR_RIGHT",          s7_make_integer(s7, RIGHT));
+    s7_define_variable(s7, "ANCHOR_BOTTOM",         s7_make_integer(s7, BOTTOM));
+    s7_define_variable(s7, "ANCHOR_ALL",            s7_make_integer(s7, ALL));
+
     s7_define_variable(s7, "F_CT_STATIC",           s7_make_integer(s7, F_CT_STATIC));
     s7_define_variable(s7, "F_CT_INPUT",            s7_make_integer(s7, F_CT_INPUT));
     s7_define_variable(s7, "F_CT_OUTPUT",           s7_make_integer(s7, F_CT_OUTPUT));
