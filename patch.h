@@ -20,6 +20,31 @@
 static Field*      g_patch_field = nullptr;
 static core_rack*  g_patch_rack  = nullptr;
 
+/* Registry of place-node calls — the metadata needed to serialise the live
+ * patch back to a .scm layout file (see patch_save_current). Position is not
+ * stored here: it is read from each node's ST_NODE entity bounds at save time
+ * so drags and window-resize re-anchoring are reflected. */
+typedef struct {
+    Node*       node;                       /* GUI node handle. */
+    char        prefix[32];                 /* Module prefix, e.g. "vco". */
+    bool        has_core;                   /* A core node was created+bound. */
+    uint32_t    core_type;                  /* core_module_type when has_core. */
+    uint32_t    core_uid;                   /* Core node UID when has_core. */
+} PatchModule;
+
+#define PATCH_MODULE_LIMIT 64
+
+static PatchModule g_patch_modules[PATCH_MODULE_LIMIT];
+static uint32_t    g_patch_module_count = 0;
+
+/* pp slot of the SAVE button in ui/menu.scm's static-id counter (slots 0..4
+ * go to the textboxes and the NEW/ABOUT buttons). Keep in sync with menu.scm. */
+#define MENU_SAVE_BUTTON_PP 5
+
+/* Destination of the menu SAVE button. Same relative-root convention as
+ * loadPatch(s7, "../patches/init.scm") in main.c. */
+#define PATCH_SAVE_PATH "../patches/save.scm"
+
 /* (load-module "prefix") -> node-handle (c-pointer to Node).
  * Evaluates <prefix>-descriptor, <prefix>-width, <prefix>-height from the
  * Scheme environment and instantiates the GUI node. The C load_module helper
@@ -61,12 +86,24 @@ static s7_pointer s7_place_node(s7_scheme* s7, s7_pointer args) {
 
     /* 3. Optionally create a core node and bind GUI ↔ core. */
     s7_int n = s7_list_length(s7, args);
+    core_module_type type = CMT_FUSE;
+    uint32_t         uid  = 0;
     if (n >= 6) {
-        core_module_type type  = (core_module_type)s7_integer(s7_list_ref(s7, args, 4));
-        uint32_t         uid   = (uint32_t)s7_integer(s7_list_ref(s7, args, 5));
-        uint32_t         index = rack->nodes++;
+        type = (core_module_type)s7_integer(s7_list_ref(s7, args, 4));
+        uid  = (uint32_t)s7_integer(s7_list_ref(s7, args, 5));
+        uint32_t index = rack->nodes++;
         core_init_node(&rack->node[index], type, uid);
         core_bind_module(node, &rack->node[index]);
+    }
+
+    /* 4. Record the module for patch serialisation (menu SAVE button). */
+    if (g_patch_module_count < PATCH_MODULE_LIMIT) {
+        PatchModule* m = &g_patch_modules[g_patch_module_count++];
+        m->node      = node;
+        m->has_core  = (n >= 6);
+        m->core_type = (uint32_t)type;
+        m->core_uid  = uid;
+        snprintf(m->prefix, sizeof(m->prefix), "%s", prefix);
     }
 
     return s7_make_c_pointer(s7, node);
@@ -198,6 +235,134 @@ void initScheme(s7_scheme* s7, Field* context) {
     load_scm_file(s7, "ui/menu.scm",           mainmenu_scm,   sizeof(mainmenu_scm) - 1);
 }
 
+/* (internal) Scheme-visible name of a core module type, matching the
+ * variables bound by bindModuleDefinitions (modules.h). */
+static const char* patch_core_type_name(core_module_type type) {
+    switch (type) {
+        case CMT_GENERATOR: return "CMT_GENERATOR";
+        case CMT_VCO:       return "CMT_VCO";
+        case CMT_CRT:       return "CMT_CRT";
+        case CMT_SPLIT:     return "CMT_SPLIT";
+        case CMT_MAINMENU:  return "CMT_MAINMENU";
+        case CMT_FUSE:
+        default:            return "CMT_FUSE";
+    }
+}
+
+/* (internal) Current screen position of a module node: the bounds of its
+ * ST_NODE (frame) entity — the same source ff_anchor_node/ff_release_node
+ * use, so drags and resize re-anchoring are reflected. */
+static void patch_node_position(Node* restrict node, uint32_t* x, uint32_t* y) {
+    for (uint32_t i = 0; i < node->entities; ++i) {
+        if (node->at[i].type == ST_NODE) {
+            *x = node->at[i].bounds.l;
+            *y = node->at[i].bounds.t;
+            return;
+        }
+    }
+    *x = 0;
+    *y = 0;
+}
+
+/** @brief Serialise the live patch to a .scm layout file.
+ *  @param path  Destination file (e.g. "../patches/save.scm").
+ *  @details Emits a patch structured like patches/init.scm: rack creation,
+ *           one place-node call per placed module (with core binding when
+ *           present), then set-crt-fps / start-core.
+ *
+ *           Runs on the event thread from the menu SAVE button — user-triggered
+ *           and off the frame loop — and performs no Scheme evaluation, so
+ *           the C↔Scheme boundary is not crossed. Only immutable rack
+ *           metadata (capacity) and node bounds are read; a concurrent drag
+ *           may tear a coordinate, which is harmless for a saved layout. */
+static void patch_save_current(const char* path) {
+    FILE* f = fopen(path, "w");
+    if (!f) {
+        fprintf(stderr, "[PATCH] failed to open '%s' for writing\n", path);
+        return;
+    }
+
+    uint32_t fps = 60;
+    if (g_patch_field->stream[0] && g_patch_field->stream[0]->extension)
+        fps = ((Oscillograph*)g_patch_field->stream[0]->extension)->fps;
+
+    uint32_t capacity = g_patch_rack ? g_patch_rack->capacity : 16;
+
+    fprintf(f, "#|\n"
+               " | patches/save.scm — saved patch layout.\n"
+               " |\n"
+               " | Written by the menu SAVE button (patch.h:patch_save_current).\n"
+               " | Mirrors patches/init.scm: creates the core rack, instantiates and\n"
+               " | places modules, wires them to core nodes, and starts the\n"
+               " | processing thread.\n"
+               " |#\n\n");
+    fprintf(f, "(define FPS %u)\n\n", (unsigned)fps);
+
+    fprintf(f, ";;--------------------------------------------------------------------------\n"
+               ";; Core rack — the DSP-side processing graph.\n"
+               ";;--------------------------------------------------------------------------\n\n");
+    fprintf(f, "(define rack (create-rack %u))\n\n", (unsigned)capacity);
+
+    fprintf(f, ";;--------------------------------------------------------------------------\n"
+               ";; Modules — one place-node call per module.\n"
+               ";; With core-type + uid: load GUI + create core node + place + bind.\n"
+               ";; Without: load GUI + place only (menu, CRT, unbound generators).\n"
+               ";;--------------------------------------------------------------------------\n\n");
+
+    for (uint32_t i = 0; i < g_patch_module_count; ++i) {
+        PatchModule* m = &g_patch_modules[i];
+        if (!m->node || !m->node->visible) continue;
+        uint32_t x, y;
+        patch_node_position(m->node, &x, &y);
+        /* Quote the prefix first, then pad the quoted unit — padding inside
+         * the quotes would change the module name string. Column layout
+         * matches patches/init.scm. Sized for prefix + quotes + NUL. */
+        char qprefix[sizeof(m->prefix) + 3];
+        snprintf(qprefix, sizeof(qprefix), "\"%s\"", m->prefix);
+        if (m->has_core)
+            fprintf(f, "(place-node rack %-12s%-4u%-4u %-14s#x%x)\n",
+                    qprefix, (unsigned)x, (unsigned)y,
+                    patch_core_type_name((core_module_type)m->core_type),
+                    (unsigned)m->core_uid);
+        else
+            fprintf(f, "(place-node rack %-12s%-4u%u)\n",
+                    qprefix, (unsigned)x, (unsigned)y);
+    }
+
+    fprintf(f, "\n;;--------------------------------------------------------------------------\n"
+               ";; CRT display refresh rate.\n"
+               ";;--------------------------------------------------------------------------\n\n");
+    fprintf(f, "(set-crt-fps FPS)\n\n");
+
+    fprintf(f, ";;--------------------------------------------------------------------------\n"
+               ";; Start the core processing thread (runs in the background).\n"
+               ";;--------------------------------------------------------------------------\n\n");
+    fprintf(f, "(start-core rack FPS)\n");
+
+    fclose(f);
+    printf("[PATCH] saved %u modules to %s\n", (unsigned)g_patch_module_count, path);
+}
+
+/* (internal) F_CE_PRESS handler for the menu SAVE button (ST_MOMENTARY). */
+static void patch_menu_save_press([[maybe_unused]] Entity* src,
+                                  [[maybe_unused]] Entity* target) {
+    patch_save_current(PATCH_SAVE_PATH);
+}
+
+/* (internal) Wire the menu SAVE button's press event to the patch saver.
+ * Runs after each successful loadPatch: the menu node is (re)created by the
+ * patch, so its entities only exist once the patch has been evaluated. The
+ * button's descriptor wiring (CallbackEvent F_CE_REPAINT → textbox repaint)
+ * is untouched; this adds the press handler in the free F_CE_PRESS slot. */
+static void patch_wire_menu_save(void) {
+    /* The menu is placed once with menu-id 0; MENU_SAVE_BUTTON_PP is the
+     * static-id slot the SAVE momentary lands on in ui/menu.scm. */
+    Entity* btn = ff_find_entity_by_id(g_patch_field,
+        core_encode_uid(CMT_MAINMENU, 0, F_CT_STATIC, MENU_SAVE_BUTTON_PP));
+    if (btn)
+        ff_add_mod_link(btn, nullptr, F_CE_PRESS, patch_menu_save_press);
+}
+
 /** @brief Load a patch from a .scm file on disk.
  *  @param s7        s7 interpreter (must have initScheme called first).
  *  @param filename  Path to the patch file (e.g. "patches/init.scm").
@@ -215,5 +380,8 @@ bool loadPatch(s7_scheme* s7, const char* filename) {
         fprintf(stderr, "[PATCH] failed to load '%s'\n", filename);
         return false;
     }
+    /* The patch just (re)created the GUI — wire patch-level UI actions that
+     * live outside the descriptor mechanism (menu SAVE button). */
+    patch_wire_menu_save();
     return true;
 }
