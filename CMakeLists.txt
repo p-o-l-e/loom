@@ -77,6 +77,6 @@ target_compile_options(loom PRIVATE
     -Wall
     -Wextra
     -Wpedantic
-    -O3
-    $<$<CONFIG:Debug>:-g>
+    $<$<CONFIG:Debug>:-O0 -g>
+    $<$<CONFIG:Release>:-O3>
 )

@@ -19,7 +19,7 @@ struct core_crt {
     } OUT;
 };
 
-inline void core_crt_process(const core_node* node) {
+void core_crt_process(const core_node* node) {
     // node->ocv[CCRT_O_X] = *node->icv[CCRT_I_X];
     // node->ocv[CCRT_O_Y] = *node->icv[CCRT_I_Y];
 

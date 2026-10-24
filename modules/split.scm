@@ -132,8 +132,20 @@
         (sector
             ID:             (encode-uid CMT_SPLIT split-id F_CT_STATIC (static-id))
             NodeID:         split-id
-            Left:           (grid-x 1)
-            Top:            (grid-y 1)
+            Left:           (grid-x 2)
+            Top:            (grid-y 2)
+            Width:          (* 5 Unit)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "INV"
+            Flags:          TRANSPARENT
+        )
+
+        (sector
+            ID:             (encode-uid CMT_SPLIT split-id F_CT_STATIC (static-id))
+            NodeID:         split-id
+            Left:           (grid-x 2)
+            Top:            (grid-y 3)
             Width:          (* 5 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX

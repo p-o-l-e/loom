@@ -1,5 +1,5 @@
 (define menu-id 0)
-(define menu-width 249) 
+(define menu-width 0)
 (define menu-height 24)
 ; Menu bar is pinned to the top border and stretches between the left and
 ; right window borders when the window is resized.
