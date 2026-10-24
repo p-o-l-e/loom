@@ -163,6 +163,55 @@ static s7_pointer s7_start_core(s7_scheme* s7, s7_pointer args) {
     return s7_make_c_pointer(s7, pt);
 }
 
+/* (connect-sockets out-uid in-uid) -> bool.
+ * Establish a cord connection between two socket entities by UID. Thin
+ * wrapper over ff_connect: resolves both entities in the patch field and
+ * wires input ↔ output — core data flow (icv slot) plus the cord spline.
+ * Either argument order works; ff_connect rejects incompatible pairs
+ * (input→input, output→output). Intended for patch files, evaluated at
+ * load time after the place-node calls that create the sockets. */
+static s7_pointer s7_connect_sockets(s7_scheme* s7, s7_pointer args) {
+    uint32_t uid_a = (uint32_t)s7_integer(s7_list_ref(s7, args, 0));
+    uint32_t uid_b = (uint32_t)s7_integer(s7_list_ref(s7, args, 1));
+    Entity* a = ff_find_entity_by_id(g_patch_field, uid_a);
+    Entity* b = ff_find_entity_by_id(g_patch_field, uid_b);
+    if (!a || !b || a->type != ST_SOCKET || b->type != ST_SOCKET)
+        return s7_make_boolean(s7, false);
+    bool ok = ff_connect(a, b);
+    if (ok) {
+        /* ff_connect marks the target hovered — correct for a drag-release,
+         * where the cursor sits on the target socket and the next mouse move
+         * maintains hover. Restoring a saved connection is not an interaction:
+         * with no cursor over anything, the stale hover would keep every
+         * restored cord highlighted (cords draw selected when either end is
+         * hovered). Clear both ends so saved cords draw in normal mode. */
+        a->hovered = false;
+        b->hovered = false;
+    }
+    return s7_make_boolean(s7, ok);
+}
+
+/* (set-control uid value) -> bool.
+ * Restore a control's value (slider, encoder, checkbox, …) by entity UID.
+ * value is the displayed total; it is written to value[CP_COARSE] — the slot
+ * the core reads through ccv and the one drag handlers write wholesale —
+ * with the transient fine slot cleared, so control, textbox and DSP all
+ * agree on the restored value. Fires F_CE_VALUE so the paired textbox
+ * repaints, exactly as a drag would. Intended for patch files, evaluated
+ * at load time after the place-node calls that create the controls. */
+static s7_pointer s7_set_control(s7_scheme* s7, s7_pointer args) {
+    uint32_t uid = (uint32_t)s7_integer(s7_list_ref(s7, args, 0));
+    float    val = (float)s7_real(s7_list_ref(s7, args, 1));
+    Entity* e = ff_find_entity_by_id(g_patch_field, uid);
+    if (!e || e->core_type != F_CT_CONTROL)
+        return s7_make_boolean(s7, false);
+    e->value[CP_COARSE] = val;
+    e->value[CP_FINE]   = 0.0f;
+    e->repaint = true;
+    e->callback[F_CE_VALUE](e, e->target[F_CE_VALUE]);
+    return s7_make_boolean(s7, true);
+}
+
 /** @brief Bind patch-construction functions into the s7 environment.
  *  @param s7       s7 interpreter.
  *  @param context  The Field (canvas) that modules are loaded into.
@@ -193,6 +242,14 @@ void bindPatchFunctions(s7_scheme* s7, Field* context) {
 
     s7_define_function(s7, "start-core", s7_start_core, 2, 0, false,
         "(start-core rack-handle fps) -> thread-handle. Start the core processing thread.");
+
+    s7_define_function(s7, "connect-sockets", s7_connect_sockets, 2, 0, false,
+        "(connect-sockets out-uid in-uid) -> bool. Connect two socket entities by UID "
+        "(restores cord connections when loading a saved patch).");
+
+    s7_define_function(s7, "set-control", s7_set_control, 2, 0, false,
+        "(set-control uid value) -> bool. Restore a control's value by entity UID "
+        "(saves/restores slider, encoder and checkbox state in patch files).");
 }
 
 /** @brief Load a single embedded Scheme source string, logging on error.
@@ -293,8 +350,14 @@ static void patch_save_current(const char* path) {
                " |\n"
                " | Written by the menu SAVE button (patch.h:patch_save_current).\n"
                " | Mirrors patches/init.scm: creates the core rack, instantiates and\n"
-               " | places modules, wires them to core nodes, and starts the\n"
-               " | processing thread.\n"
+               " | places modules, wires them to core nodes, restores cord\n"
+               " | connections, and starts the processing thread.\n"
+               " |\n"
+               " | Each connect-sockets call is one cable:\n"
+               " |   (connect-sockets output-socket-uid input-socket-uid)\n"
+               " |\n"
+               " | Each set-control call is one control value:\n"
+               " |   (set-control control-uid value)\n"
                " |#\n\n");
     fprintf(f, "(define FPS %u)\n\n", (unsigned)fps);
 
@@ -330,6 +393,46 @@ static void patch_save_current(const char* path) {
     }
 
     fprintf(f, "\n;;--------------------------------------------------------------------------\n"
+               ";; Cord connections — one connect-sockets call per cable (output → input).\n"
+               ";;--------------------------------------------------------------------------\n\n");
+
+    /* One line per cable, emitted from the output end so each connection
+     * appears exactly once (both ends carry connected/connection). */
+    uint32_t connections = 0;
+    for (uint32_t n = 0; n < g_patch_field->nodes; ++n) {
+        Node* node = &g_patch_field->node[n];
+        if (!node->visible) continue;
+        for (uint32_t i = 0; i < node->entities; ++i) {
+            Entity* e = &node->at[i];
+            if (e->type != ST_SOCKET || e->core_type != F_CT_OUTPUT) continue;
+            auto ext = (Socket*)e->extension;
+            if (!ext->connected || !ext->connection) continue;
+            fprintf(f, "(connect-sockets #x%x #x%x)\n",
+                    (unsigned)e->uid, (unsigned)ext->connection->uid);
+            ++connections;
+        }
+    }
+
+    fprintf(f, "\n;;--------------------------------------------------------------------------\n"
+               ";; Control values — one set-control call per control (slider, encoder,\n"
+               ";; checkbox). Value is the displayed total (coarse + fine).\n"
+               ";;--------------------------------------------------------------------------\n\n");
+
+    uint32_t controls = 0;
+    for (uint32_t n = 0; n < g_patch_field->nodes; ++n) {
+        Node* node = &g_patch_field->node[n];
+        if (!node->visible) continue;
+        for (uint32_t i = 0; i < node->entities; ++i) {
+            Entity* e = &node->at[i];
+            if (e->core_type != F_CT_CONTROL) continue;
+            /* %.9g round-trips an IEEE-754 float exactly through decimal. */
+            float total = e->value[CP_COARSE] + e->value[CP_FINE];
+            fprintf(f, "(set-control #x%x %.9g)\n", (unsigned)e->uid, (double)total);
+            ++controls;
+        }
+    }
+
+    fprintf(f, "\n;;--------------------------------------------------------------------------\n"
                ";; CRT display refresh rate.\n"
                ";;--------------------------------------------------------------------------\n\n");
     fprintf(f, "(set-crt-fps FPS)\n\n");
@@ -340,7 +443,9 @@ static void patch_save_current(const char* path) {
     fprintf(f, "(start-core rack FPS)\n");
 
     fclose(f);
-    printf("[PATCH] saved %u modules to %s\n", (unsigned)g_patch_module_count, path);
+    printf("[PATCH] saved %u modules, %u connections, %u controls to %s\n",
+           (unsigned)g_patch_module_count, (unsigned)connections,
+           (unsigned)controls, path);
 }
 
 /* (internal) F_CE_PRESS handler for the menu SAVE button (ST_MOMENTARY). */
