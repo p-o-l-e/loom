@@ -38,3 +38,6 @@ void core_bind_module(Node* node, core_node* module) {
         }
     }
 }
+
+/* Patch construction bindings — included last so core_bind_module is visible. */
+#include "patch.h"

@@ -1,9 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <time.h>
-#include <signal.h>
 #include <stdbool.h>
-#include <unistd.h>
 #include "bridge.h"
 #include "core/node.h"
 #define QOI_IMPLEMENTATION
@@ -11,95 +8,24 @@
 
 #define WIDTH  1280
 #define HEIGHT 720
-#define RACK_CAPACITY 16
-#define FPS 30
 
-void timer_callback(union sigval) {
-    pthread_cond_signal(&_repaint_condition);
-}
-
-int main(int argc, char** argv)
+int main(void)
 {
-    timer_t timer_id;
-    struct sigevent sev;
-    struct itimerspec its;
-
-    sev = (struct sigevent){0};
-    its = (struct itimerspec){0};
-
-    sev.sigev_notify = SIGEV_THREAD;
-    sev.sigev_notify_function = timer_callback;
-    sev.sigev_value.sival_ptr = &timer_id;
-
-    if (timer_create(CLOCK_REALTIME, &sev, &timer_id) == -1) {
-        perror("timer_create");
-        return 1;
-    }
-
-    its.it_value.tv_sec     = 1;
-    its.it_value.tv_nsec    = 0;
-    its.it_interval.tv_sec  = 0;
-    its.it_interval.tv_nsec = 0;
-
-    if (timer_settime(timer_id, 0, &its, NULL) == -1) {
-        perror("timer_settime");
-        timer_delete(timer_id);
-        return 1;
-    }
-
     Field* context = ffCreateField(0, 0, WIDTH, HEIGHT, 7, ROOT);
 
     printf("[MAIN] initField\n");
 
+    /* initScheme binds all C functions into s7 and loads the embedded
+     * module definitions. Then loadPatch loads the patch layout from disk
+     * — the patch constructs the rack, instantiates modules, places them,
+     * wires them to core nodes, and starts the processing thread. */
     s7_scheme* s7 = s7_init();
-    bindGuiConstants(s7);
-    bindModuleDefinitions(s7);
-    /* sizeof - 1: arrays are NUL-terminated (#embed does not add one), and
-       s7_load_c_string requires content[bytes] == 0. */
-    s7_load_c_string(s7, init_scm, sizeof(init_scm) - 1);
-    s7_load_c_string(s7, layout_scm, sizeof(layout_scm) - 1);
-    s7_load_c_string(s7, vco_scm, sizeof(vco_scm) - 1);
-    s7_load_c_string(s7, generator_scm, sizeof(generator_scm) - 1);
-    s7_load_c_string(s7, crt_scm, sizeof(crt_scm) - 1);
-    s7_load_c_string(s7, split_scm, sizeof(split_scm) - 1);
-    s7_load_c_string(s7, mainmenu_scm, sizeof(mainmenu_scm) - 1);
+    initScheme(s7, context);
+    loadPatch(s7, "../patches/init.scm");
 
-    core_rack* rack = core_create_rack(RACK_CAPACITY);
-
-    core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xa);
-    core_init_node(&rack->node[rack->nodes++], CMT_GENERATOR, 0xb);
-    core_init_node(&rack->node[rack->nodes++], CMT_VCO, 0xc);
-    core_init_node(&rack->node[rack->nodes++], CMT_SPLIT, 0xd);
-
-    auto menu = load_module(s7, context, "menu");
-    auto vco = load_module(s7, context, "vco");
-    auto gen_a = load_module(s7, context, "generator");
-    auto gen_b = load_module(s7, context, "generator");
-    auto gen_c = load_module(s7, context, "generator");
-    auto crt = load_module(s7, context, "crt");
-    auto split = load_module(s7, context, "split");
-    ffPlaceNode(context, menu, 0, 0);
-    ffPlaceNode(context, vco, 200, 50);
-    ffPlaceNode(context, gen_a, 500, 50);
-    ffPlaceNode(context, gen_b, 500, 175);
-    ffPlaceNode(context, gen_c, 750, 175);
-    ffPlaceNode(context, crt, 500, 300);
-    ffPlaceNode(context, split, 50, 350);
-
-    if (context->stream[0]) {
-        auto osc = (Oscillograph*)context->stream[0]->extension;
-        osc->fps = FPS;
-    }
-
-    core_bind_module(gen_a, &rack->node[0]);
-    core_bind_module(gen_b, &rack->node[1]);
-    core_bind_module(vco, &rack->node[2]);
-    core_bind_module(split, &rack->node[3]);
-    core_thread* pt = core_start(rack, FPS);
-
+    /* field_loop owns the thread lifecycle: spawns the draw and event
+     * threads and blocks until the window is closed (then calls exit). */
     field_loop(context);
 
-    core_stop(pt);
-    core_destroy_rack(rack);
     return 0;
 }

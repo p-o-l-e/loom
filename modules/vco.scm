@@ -401,7 +401,7 @@
             Width:          (* 6 Unit)
             Height:         Unit
             Type:           ST_TEXTBOX
-            Label:          "SQUARE"
+            Label:          "PULSE"
             Flags:          TRANSPARENT
         )
 

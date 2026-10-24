@@ -28,10 +28,13 @@ const char split_scm[]      = {
     #embed "modules/split.scm"
     , 0
 };
-const char mainmenu_scm[]        = { 
+const char mainmenu_scm[]        = {
     #embed "ui/menu.scm"
     , 0
 };
+/* Patches are NOT embedded — they are loaded from the filesystem via
+ * s7_load() so users can save, share, and edit patch layouts as .scm files.
+ * See patch.h:loadPatch(). */
 
 void bindModuleDefinitions(s7_scheme *s7) {
     s7_define_variable(s7, "CMT_FUSE", s7_make_integer(s7, CMT_FUSE));

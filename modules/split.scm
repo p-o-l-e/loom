@@ -37,12 +37,24 @@
             ID:             (encode-uid CMT_SPLIT split-id F_CT_INPUT (input-id))
             NodeID:         split-id
             Left:           (grid-x 0)
-            Top:            (grid-y 0)
+            Top:            (grid-y 1)
             Width:          Unit
             Height:         Unit
             Type:           ST_SOCKET
             CoreType:       F_CT_INPUT
             Flags:          (logior INTERCON MOVEABLE)
+        )
+
+        (sector
+            ID:             (encode-uid CMT_SPLIT split-id F_CT_STATIC (static-id))
+            NodeID:         split-id
+            Left:           (grid-x 1)
+            Top:            (grid-y 1)
+            Width:          (grid-x 9)
+            Height:         Unit
+            Type:           ST_TEXTBOX
+            Label:          "INPUT"
+            Flags:          TRANSPARENT
         )
 
         (sector

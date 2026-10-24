@@ -1,0 +1,219 @@
+#pragma once
+/* patch.h — Scheme bindings for patch construction.
+ *
+ * Included at the end of bridge.h (after core_bind_module is defined).
+ * Exposes C functions to Scheme so that patches/init.scm can declaratively
+ * describe the module layout: which modules to instantiate, where to place
+ * them, which core nodes to create, and how to wire them together.
+ *
+ * Design: Scheme is the steering wheel. The C side owns the Field, the s7
+ * interpreter, and the frame loop. Scheme owns the patch topology.
+ */
+#include "scheme.h"
+#include "core/core.h"
+#include "bridge.h"
+
+/* Captured context — set once by bindPatchFunctions, used by every binding.
+ * The rack is created from Scheme (create-rack) and stored here so that
+ * bind-module and start-core can find it without threading it through
+ * every call. */
+static Field*      g_patch_field = nullptr;
+static core_rack*  g_patch_rack  = nullptr;
+
+/* (load-module "prefix") -> node-handle (c-pointer to Node).
+ * Evaluates <prefix>-descriptor, <prefix>-width, <prefix>-height from the
+ * Scheme environment and instantiates the GUI node. The C load_module helper
+ * auto-increments <prefix>-id so repeated calls create unique instances. */
+static s7_pointer s7_load_module(s7_scheme* s7, s7_pointer args) {
+    const char* prefix = s7_string(s7_list_ref(s7, args, 0));
+    Node* node = load_module(s7, g_patch_field, prefix);
+    return s7_make_c_pointer(s7, node);
+}
+
+/* (place-node rack prefix x y [core-type core-uid]) -> node-handle.
+ * High-level patch-construction primitive — one call per module:
+ *   1. load-module: instantiate the GUI module from Scheme definitions
+ *   2. ffPlaceNode: position it on the canvas at (x, y)
+ *   3. (optional) rack-add-node + bind-module: create a core node and wire
+ *      the GUI module's controls/sockets to the core node's ccv/icv/ocv
+ *
+ *   rack       — rack handle from create-rack
+ *   prefix     — module prefix string (e.g. "generator", "vco", "menu")
+ *   x, y       — pixel position on the canvas
+ *   core-type  — optional: core module type (CMT_GENERATOR, CMT_VCO, ...)
+ *   core-uid   — optional: core node UID (e.g. #xa)
+ *
+ * Without core-type/core-uid, only the GUI module is loaded and placed
+ * (e.g. menu bars, CRTs, or generators not bound to the core). Returns
+ * the GUI node handle (c-pointer) for later use. */
+static s7_pointer s7_place_node(s7_scheme* s7, s7_pointer args) {
+    core_rack*  rack   = (core_rack*)s7_c_pointer(s7_list_ref(s7, args, 0));
+    const char* prefix = s7_string(s7_list_ref(s7, args, 1));
+    uint32_t    x      = (uint32_t)s7_integer(s7_list_ref(s7, args, 2));
+    uint32_t    y      = (uint32_t)s7_integer(s7_list_ref(s7, args, 3));
+
+    /* 1. Load the GUI module from Scheme definitions. */
+    Node* node = load_module(s7, g_patch_field, prefix);
+    if (!node) return s7_make_c_pointer(s7, nullptr);
+
+    /* 2. Place it on the canvas. */
+    ffPlaceNode(g_patch_field, node, x, y);
+
+    /* 3. Optionally create a core node and bind GUI ↔ core. */
+    s7_int n = s7_list_length(s7, args);
+    if (n >= 6) {
+        core_module_type type  = (core_module_type)s7_integer(s7_list_ref(s7, args, 4));
+        uint32_t         uid   = (uint32_t)s7_integer(s7_list_ref(s7, args, 5));
+        uint32_t         index = rack->nodes++;
+        core_init_node(&rack->node[index], type, uid);
+        core_bind_module(node, &rack->node[index]);
+    }
+
+    return s7_make_c_pointer(s7, node);
+}
+
+/* (create-rack capacity) -> rack-handle (c-pointer to core_rack).
+ * Allocates a core processing rack. Stored in g_patch_rack for later use
+ * by rack-add-node, bind-module, and start-core. */
+static s7_pointer s7_create_rack(s7_scheme* s7, s7_pointer args) {
+    uint32_t capacity = (uint32_t)s7_integer(s7_list_ref(s7, args, 0));
+    g_patch_rack = core_create_rack(capacity);
+    return s7_make_c_pointer(s7, g_patch_rack);
+}
+
+/* (rack-add-node rack-handle type id) -> node-index (integer).
+ * Appends a core node of the given module type and UID to the rack.
+ * Returns the index so Scheme can later pass it to bind-module. */
+static s7_pointer s7_rack_add_node(s7_scheme* s7, s7_pointer args) {
+    core_rack*       rack  = (core_rack*)s7_c_pointer(s7_list_ref(s7, args, 0));
+    core_module_type type  = (core_module_type)s7_integer(s7_list_ref(s7, args, 1));
+    uint32_t         id    = (uint32_t)s7_integer(s7_list_ref(s7, args, 2));
+    uint32_t         index = rack->nodes++;
+    core_init_node(&rack->node[index], type, id);
+    return s7_make_integer(s7, (s7_int)index);
+}
+
+/* (bind-module node-handle core-node-index) -> unspecified.
+ * Wires a GUI module (Node*) to a core node by matching entity UIDs.
+ * The GUI module's control values, input sockets, and output sockets are
+ * linked to the core node's ccv/icv/ocv arrays. */
+static s7_pointer s7_bind_module(s7_scheme* s7, s7_pointer args) {
+    Node*    node  = (Node*)s7_c_pointer(s7_list_ref(s7, args, 0));
+    uint32_t index = (uint32_t)s7_integer(s7_list_ref(s7, args, 1));
+    core_bind_module(node, &g_patch_rack->node[index]);
+    return s7_unspecified(s7);
+}
+
+/* (set-crt-fps fps) -> unspecified.
+ * Sets the refresh rate on the first CRT stream entity (stream[0]).
+ * Matches the original main.c behaviour: osc->fps = FPS. */
+static s7_pointer s7_set_crt_fps(s7_scheme* s7, s7_pointer args) {
+    uint32_t fps = (uint32_t)s7_integer(s7_list_ref(s7, args, 0));
+    if (g_patch_field->stream[0]) {
+        auto osc = (Oscillograph*)g_patch_field->stream[0]->extension;
+        osc->fps = fps;
+    }
+    return s7_unspecified(s7);
+}
+
+/* (start-core rack-handle fps) -> thread-handle (c-pointer to core_thread).
+ * Spawns the core processing thread. The thread runs until the process
+ * exits (field_loop calls exit() on window close). */
+static s7_pointer s7_start_core(s7_scheme* s7, s7_pointer args) {
+    core_rack* rack = (core_rack*)s7_c_pointer(s7_list_ref(s7, args, 0));
+    uint32_t   fps  = (uint32_t)s7_integer(s7_list_ref(s7, args, 1));
+    core_thread* pt = core_start(rack, fps);
+    return s7_make_c_pointer(s7, pt);
+}
+
+/** @brief Bind patch-construction functions into the s7 environment.
+ *  @param s7       s7 interpreter.
+ *  @param context  The Field (canvas) that modules are loaded into.
+ *  @details Call after bindGuiConstants and bindModuleDefinitions, before
+ *           loading patches/init.scm. */
+void bindPatchFunctions(s7_scheme* s7, Field* context) {
+    g_patch_field = context;
+
+    s7_define_function(s7, "load-module", s7_load_module, 1, 0, false,
+        "(load-module prefix) -> node-handle. Instantiate a GUI module from Scheme definitions.");
+
+    s7_define_function(s7, "place-node", s7_place_node, 4, 2, false,
+        "(place-node rack prefix x y [core-type core-uid]) -> node-handle. "
+        "Load a GUI module, place it at (x,y), and optionally create+bind a core node. "
+        "This is the primary patch-construction primitive — one call per module.");
+
+    s7_define_function(s7, "create-rack", s7_create_rack, 1, 0, false,
+        "(create-rack capacity) -> rack-handle. Create a core processing rack.");
+
+    s7_define_function(s7, "rack-add-node", s7_rack_add_node, 3, 0, false,
+        "(rack-add-node rack-handle type id) -> node-index. Append a core node to the rack.");
+
+    s7_define_function(s7, "bind-module", s7_bind_module, 2, 0, false,
+        "(bind-module node-handle core-node-index). Wire a GUI module to a core node.");
+
+    s7_define_function(s7, "set-crt-fps", s7_set_crt_fps, 1, 0, false,
+        "(set-crt-fps fps). Set the CRT display refresh rate.");
+
+    s7_define_function(s7, "start-core", s7_start_core, 2, 0, false,
+        "(start-core rack-handle fps) -> thread-handle. Start the core processing thread.");
+}
+
+/** @brief Load a single embedded Scheme source string, logging on error.
+ *  @param s7       s7 interpreter.
+ *  @param name     Human-readable name for log messages.
+ *  @param content  NUL-terminated Scheme source (from #embed).
+ *  @param bytes    Content length (excluding NUL; pass sizeof(array) - 1).
+ */
+static void load_scm_file(s7_scheme* s7, const char* name, const char* content, s7_int bytes) {
+    printf("[SCHEME] loading %s\n", name);
+    s7_load_c_string(s7, content, bytes);
+}
+
+/** @brief Initialise the Scheme environment: bind C functions and load all
+ *         embedded module definitions (helpers, layout, module descriptors).
+ *  @param s7       s7 interpreter (must be freshly created via s7_init).
+ *  @param context  The Field (canvas) passed to patch-construction bindings.
+ *  @details Binds GUI constants, core module types, and patch-construction
+ *           primitives, then loads the embedded Scheme sources that define
+ *           the available module types. Does NOT load a patch — call
+ *           loadPatch() separately to instantiate a specific layout.
+ *
+ *           Load order matters: helpers first (init, layout), then module
+ *           definitions (vco, generator, crt, split, menu). */
+void initScheme(s7_scheme* s7, Field* context) {
+    /* 1. Bind C constants and functions into the Scheme environment. */
+    bindGuiConstants(s7);
+    bindModuleDefinitions(s7);
+    bindPatchFunctions(s7, context);
+
+    /* 2. Load embedded Scheme sources in dependency order.
+     *    sizeof - 1: arrays are NUL-terminated (#embed does not add one),
+     *    and s7_load_c_string requires content[bytes] == 0. */
+    load_scm_file(s7, "modules/init.scm",      init_scm,       sizeof(init_scm) - 1);
+    load_scm_file(s7, "modules/layout.scm",    layout_scm,     sizeof(layout_scm) - 1);
+    load_scm_file(s7, "modules/vco.scm",       vco_scm,        sizeof(vco_scm) - 1);
+    load_scm_file(s7, "modules/generator.scm", generator_scm,  sizeof(generator_scm) - 1);
+    load_scm_file(s7, "modules/crt.scm",       crt_scm,        sizeof(crt_scm) - 1);
+    load_scm_file(s7, "modules/split.scm",     split_scm,      sizeof(split_scm) - 1);
+    load_scm_file(s7, "ui/menu.scm",           mainmenu_scm,   sizeof(mainmenu_scm) - 1);
+}
+
+/** @brief Load a patch from a .scm file on disk.
+ *  @param s7        s7 interpreter (must have initScheme called first).
+ *  @param filename  Path to the patch file (e.g. "patches/init.scm").
+ *  @details Patches are loaded from the filesystem (not #embed) so they can
+ *           be saved, shared, and edited as plain .scm files. The patch file
+ *           uses the primitives bound by initScheme (load-module, place-node,
+ *           create-rack, rack-add-node, bind-module, set-crt-fps, start-core)
+ *           to construct the module layout.
+ *
+ *           Returns true on success, false if the file could not be loaded. */
+bool loadPatch(s7_scheme* s7, const char* filename) {
+    printf("[PATCH] loading %s\n", filename);
+    s7_pointer result = s7_load(s7, filename);
+    if (result == NULL) {
+        fprintf(stderr, "[PATCH] failed to load '%s'\n", filename);
+        return false;
+    }
+    return true;
+}
