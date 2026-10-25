@@ -2,6 +2,7 @@ build
 build-release
 build-vulkan
 build-opengl
+build-clang-test
 cmake-build-debug
 cmake-build-ubsan
 cmake-build-asan

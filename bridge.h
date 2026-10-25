@@ -41,3 +41,6 @@ void core_bind_module(Node* node, core_node* module) {
 
 /* Patch construction bindings — included last so core_bind_module is visible. */
 #include "patch.h"
+
+/* UI wiring — wire_controls(s7, field) passed to loadPatch as PatchWireFn. */
+#include "links.h"

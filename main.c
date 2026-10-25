@@ -21,7 +21,7 @@ int main(void)
      * wires them to core nodes, and starts the processing thread. */
     s7_scheme* s7 = s7_init();
     initScheme(s7, context);
-    loadPatch(s7, "../patches/save.scm");
+    loadPatch(s7, context, "../patches/save.scm", wire_controls);
 
     /* field_loop owns the thread lifecycle: spawns the draw and event
      * threads and blocks until the window is closed (then calls exit). */

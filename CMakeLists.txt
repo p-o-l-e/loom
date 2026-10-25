@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.5)
 
+# Default to Clang unless the user explicitly overrides the compiler.
+if(NOT DEFINED CMAKE_C_COMPILER AND NOT DEFINED ENV{CC})
+    find_program(CLANG_BIN clang)
+    if(CLANG_BIN)
+        set(CMAKE_C_COMPILER ${CLANG_BIN})
+    endif()
+endif()
+
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
@@ -9,7 +17,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-project(FIELD)
+project(FIELD LANGUAGES C)
 
 # Rendering backend selection: vulkan (default) or opengl
 set(LOOM_RENDERER "vulkan" CACHE STRING "Rendering backend: vulkan or opengl")

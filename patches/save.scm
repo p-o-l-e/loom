@@ -23,17 +23,17 @@
 
 ;;--------------------------------------------------------------------------
 ;; Modules — one place-node call per module.
-;; With core-type + uid: load GUI + create core node + place + bind.
+;; With core-type: load GUI + create core node + place + bind.
 ;; Without: load GUI + place only (menu, CRT, unbound generators).
 ;;--------------------------------------------------------------------------
 
 (place-node rack "menu"      0   0)
-(place-node rack "vco"       0   25   CMT_VCO       #xc)
-(place-node rack "generator" 0   225  CMT_GENERATOR #xa)
-(place-node rack "generator" 0   325  CMT_GENERATOR #xb)
-(place-node rack "generator" 0   425  CMT_GENERATOR #xe)
+(place-node rack "vco"       0   25   CMT_VCO)
+(place-node rack "generator" 0   225  CMT_GENERATOR)
+(place-node rack "generator" 0   325  CMT_GENERATOR)
+(place-node rack "generator" 0   425  CMT_GENERATOR)
 (place-node rack "crt"       350 75)
-(place-node rack "split"     250 325  CMT_SPLIT     #xd)
+(place-node rack "split"     250 325  CMT_SPLIT)
 
 ;;--------------------------------------------------------------------------
 ;; Cord connections — one connect-sockets call per cable (output → input).
@@ -53,9 +53,9 @@
 (set-control #x2000103 0)
 (set-control #x2000104 0)
 (set-control #x2000105 0)
-(set-control #x2000106 1)
+(set-control #x2000106 0)
 (set-control #x2000107 0)
-(set-control #x2000108 0)
+(set-control #x2000108 1)
 (set-control #x1000100 100)
 (set-control #x1000101 1)
 (set-control #x1000102 0.349999994)

@@ -6,9 +6,9 @@
  | them to core nodes, and starts the processing thread.
  |
  | Each place-node call is one module:
- |   (place-node rack prefix x y [core-type core-uid])
+ |   (place-node rack prefix x y [core-type])
  |
- | Without core-type/uid, only the GUI is loaded and placed (no core node).
+ | Without core-type, only the GUI is loaded and placed (no core node).
  |#
 
 (define FPS 60)
@@ -21,17 +21,17 @@
 
 ;;--------------------------------------------------------------------------
 ;; Modules — one place-node call per module.
-;; With core-type + uid: load GUI + create core node + place + bind.
+;; With core-type: load GUI + create core node + place + bind.
 ;; Without: load GUI + place only (menu, CRT, unbound generators).
 ;;--------------------------------------------------------------------------
 
 (place-node rack "menu"      0   0)
-(place-node rack "vco"       200 50   CMT_VCO       #xc)
-(place-node rack "generator" 500 50   CMT_GENERATOR #xa)
-(place-node rack "generator" 500 175  CMT_GENERATOR #xb)
-(place-node rack "generator" 750 175  CMT_GENERATOR #xe)
+(place-node rack "vco"       200 50   CMT_VCO)
+(place-node rack "generator" 500 50   CMT_GENERATOR)
+(place-node rack "generator" 500 175  CMT_GENERATOR)
+(place-node rack "generator" 750 175  CMT_GENERATOR)
 (place-node rack "crt"       500 300)
-(place-node rack "split"     50  350  CMT_SPLIT     #xd)
+(place-node rack "split"     50  350  CMT_SPLIT)
 
 ;;--------------------------------------------------------------------------
 ;; CRT display refresh rate.
